@@ -45,12 +45,12 @@ else
             Password = password,
             SslMode = MySqlConnector.MySqlSslMode.None,
             AllowPublicKeyRetrieval = true,
-            ConnectionTimeout = 5 // Fail fast (5 segundos) para não travar o deploy
+            ConnectionProtocol = MySqlConnector.MySqlConnectionProtocol.Tcp // Forçar TCP para evitar erro de socket
         };
 
         connectionString = builderStr.ConnectionString;
         
-        Console.WriteLine($"[DEBUG] Conectando em: Server={builderStr.Server};Port={builderStr.Port};User={builderStr.UserID};Ssl={builderStr.SslMode}");
+        Console.WriteLine($"[DEBUG] Conectando em (TCP): Server={builderStr.Server};Port={builderStr.Port};User={builderStr.UserID};Ssl={builderStr.SslMode}");
     }
     catch (Exception ex)
     {
@@ -63,8 +63,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         connectionString,
         new MySqlServerVersion(new Version(8, 0, 36)),
         mySqlOptions => mySqlOptions.EnableRetryOnFailure(
-            maxRetryCount: 3, // Menos retentativas no startup
-            maxRetryDelay: TimeSpan.FromSeconds(3),
+            maxRetryCount: 5,
+            maxRetryDelay: TimeSpan.FromSeconds(5),
             errorNumbersToAdd: null)
     ));
 
@@ -75,10 +75,8 @@ using (var scope = app.Services.CreateScope())
 {
     try
     {
-        // ATENÇÃO: Migração comentada temporariamente para garantir que o App inicie e mostre erros na tela
-        // var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        // db.Database.Migrate();
-        Console.WriteLine("Migração automática ignorada para debug de conexão.");
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        db.Database.Migrate();
     }
     catch (Exception ex)
     {
