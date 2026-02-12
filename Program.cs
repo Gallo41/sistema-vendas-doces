@@ -3,32 +3,44 @@ using SistemaVendasDoces.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configuração de Porta para Railway (PRIORIDADE MÁXIMA)
+// O Railway define a porta na variável PORT. Precisamos escutar 0.0.0.0:PORT
+var port = Environment.GetEnvironmentVariable("PORT");
+if (!string.IsNullOrEmpty(port))
+{
+    builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+}
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
 // Configuração do banco de dados MySQL
-// No Railway: adicionar variável DATABASE_URL com a connection string
 var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL");
 
 if (string.IsNullOrEmpty(connectionString))
 {
-    // Local development - usa appsettings.json
+    // Local development
     connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? "";
 }
 else
 {
     // Fix para Railway: Converter URL mysql:// para connection string padrão
-    // Formato esperado: mysql://user:password@host:port/database
     try 
     {
         var dbUri = new Uri(connectionString);
-        var userInfo = dbUri.UserInfo.Split(':');
-        connectionString = $"Server={dbUri.Host};Port={dbUri.Port};Database={dbUri.AbsolutePath.TrimStart('/')};User={userInfo[0]};Password={userInfo[1]};";
+        var userInfo = dbUri.UserInfo.Split(new[] { ':' }, 2); // Split em no máximo 2 partes (user:pass)
+        var username = userInfo[0];
+        var password = userInfo.Length > 1 ? userInfo[1] : "";
+        
+        // Decodifica %20, etc se necessário (Uri faz isso, mas garantindo)
+        password = Uri.UnescapeDataString(password);
+
+        connectionString = $"Server={dbUri.Host};Port={dbUri.Port};Database={dbUri.AbsolutePath.TrimStart('/')};User={username};Password={password};";
     }
-    catch (Exception)
+    catch (Exception ex)
     {
-        // Se falhar o parse (já estiver no formato correto), mantém como está
-        Console.WriteLine("Aviso: Não foi possível fazer o parse da DATABASE_URL como URI. Usando string original.");
+        Console.WriteLine($"Erro ao fazer parse da DATABASE_URL: {ex.Message}");
+        // Se falhar, tenta usar como está ou fallback
     }
 }
 
@@ -44,11 +56,23 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 var app = builder.Build();
 
-// Auto-migrate database on startup (importante pra Railway)
+// Auto-migrate database on startup
+// BLOCO TRY-CATCH para evitar que o app caia se o banco falhar (permite ver logs)
 using (var scope = app.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    db.Database.Migrate();
+    try
+    {
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        db.Database.Migrate();
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine("------------------------------------------");
+        Console.WriteLine("ERRO CRÍTICO NA MIGRAÇÃO DO BANCO DE DADOS:");
+        Console.WriteLine(ex.Message);
+        Console.WriteLine("------------------------------------------");
+        // Não relança a exceção para permitir que a aplicação suba e responda ao Health Check
+    }
 }
 
 // Configuração de Localização (pt-BR)
@@ -76,16 +100,5 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-// Configuração de Porta para Railway (e outros serviços cloud)
-var port = Environment.GetEnvironmentVariable("PORT");
-if (!string.IsNullOrEmpty(port))
-{
-    // Se a variável PORT estiver definida (ambiente de produção/cloud), escuta nessa porta
-    app.Run($"http://0.0.0.0:{port}");
-}
-else
-{
-    // Desenvolvimento local
-    app.Run();
-}
+app.Run();
 
