@@ -122,19 +122,52 @@ app.MapGet("/debug-railway", async (ApplicationDbContext db) =>
     sb.AppendLine($"Data/Hora: {DateTime.Now}");
     
     var envStr = Environment.GetEnvironmentVariable("DATABASE_URL");
-    sb.AppendLine($"DATABASE_URL existe? {!string.IsNullOrEmpty(envStr)}");
+    var mysqlUrl = Environment.GetEnvironmentVariable("MYSQL_URL");
     
-    if (!string.IsNullOrEmpty(envStr))
+    sb.AppendLine($"DATABASE_URL: {(string.IsNullOrEmpty(envStr) ? "Não Encontrada" : "Encontrada")}");
+    sb.AppendLine($"MYSQL_URL: {(string.IsNullOrEmpty(mysqlUrl) ? "Não Encontrada" : "Encontrada")}");
+
+    var connectionStringToTest = "";
+
+    // Tentar processar MYSQL_URL se existir
+    if (!string.IsNullOrEmpty(mysqlUrl))
     {
+        sb.AppendLine("\nProcessando MYSQL_URL:");
         try {
-            var uri = new Uri(envStr);
-            sb.AppendLine($"Parse URI sucesso:");
+            var uri = new Uri(mysqlUrl);
             sb.AppendLine($" - Host: {uri.Host}");
             sb.AppendLine($" - Port: {uri.Port}");
             sb.AppendLine($" - Scheme: {uri.Scheme}");
+            sb.AppendLine($" - User Info: {(string.IsNullOrEmpty(uri.UserInfo) ? "Vazio" : "***")}");
+            
+            var userInfo = uri.UserInfo.Split(new[] { ':' }, 2);
+            var username = userInfo[0];
+            var password = userInfo.Length > 1 ? userInfo[1] : "";
+            password = Uri.UnescapeDataString(password);
+            
+            var headerPort = uri.Port;
+            if (headerPort == -1) headerPort = 3306;
+
+            var builderStr = new MySqlConnector.MySqlConnectionStringBuilder
+            {
+                Server = uri.Host,
+                Port = (uint)headerPort,
+                Database = uri.AbsolutePath.TrimStart('/'),
+                UserID = username,
+                Password = password,
+                SslMode = MySqlConnector.MySqlSslMode.None,
+                AllowPublicKeyRetrieval = true,
+                ConnectionProtocol = MySqlConnector.MySqlConnectionProtocol.Tcp 
+            };
+            connectionStringToTest = builderStr.ConnectionString;
+            sb.AppendLine($" -> Connection String montada com sucesso: Server={builderStr.Server}");
         } catch (Exception ex) {
-            sb.AppendLine($"ERRO AO FAZER PARSE DA URI: {ex.Message}");
+            sb.AppendLine($"ERRO AO FAZER PARSE DA MYSQL_URL: {ex.Message}");
         }
+    }
+    else if (!string.IsNullOrEmpty(envStr))
+    {
+         // Lógica para DATABASE_URL se existisse...
     }
 
     sb.AppendLine("\nVariáveis de Ambiente (MYSQL*):");
