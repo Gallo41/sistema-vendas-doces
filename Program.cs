@@ -111,6 +111,65 @@ app.UseRouting();
 
 app.UseAuthorization();
 
+// Endpoint de DEBUG para diagnóstico do Railway
+app.MapGet("/debug-railway", async (ApplicationDbContext db) =>
+{
+    var sb = new System.Text.StringBuilder();
+    sb.AppendLine("=== DIAGNÓSTICO RAILWAY ===");
+    sb.AppendLine($"Data/Hora: {DateTime.Now}");
+    
+    var envStr = Environment.GetEnvironmentVariable("DATABASE_URL");
+    sb.AppendLine($"DATABASE_URL existe? {!string.IsNullOrEmpty(envStr)}");
+    
+    if (!string.IsNullOrEmpty(envStr))
+    {
+        try {
+            var uri = new Uri(envStr);
+            sb.AppendLine($"Parse URI sucesso:");
+            sb.AppendLine($" - Host: {uri.Host}");
+            sb.AppendLine($" - Port: {uri.Port}");
+            sb.AppendLine($" - Scheme: {uri.Scheme}");
+        } catch (Exception ex) {
+            sb.AppendLine($"ERRO AO FAZER PARSE DA URI: {ex.Message}");
+        }
+    }
+
+    sb.AppendLine("\nVariáveis de Ambiente (MYSQL*):");
+    foreach (System.Collections.DictionaryEntry env in Environment.GetEnvironmentVariables())
+    {
+        var key = env.Key.ToString();
+        if (key.ToUpper().Contains("MYSQL") || key.ToUpper().Contains("DB") || key.ToUpper().Contains("PORT"))
+        {
+             var val = env.Value.ToString();
+             // Mascarar senha
+             if (key.ToUpper().Contains("URL") || key.ToUpper().Contains("PASS")) 
+                 val = val.Length > 10 ? val.Substring(0, 10) + "..." : "***";
+             
+             sb.AppendLine($"- {key} = {val}");
+        }
+    }
+
+    sb.AppendLine("\nTentando conexão com o banco...");
+    try
+    {
+        if (db.Database.CanConnect())
+        {
+            sb.AppendLine("SUCESSO! Conexão estabelecida.");
+        }
+        else
+        {
+            sb.AppendLine("FALHA! CanConnect retornou false.");
+        }
+    }
+    catch (Exception ex)
+    {
+        sb.AppendLine($"EXCEÇÃO ao conectar: {ex.Message}");
+        if (ex.InnerException != null) sb.AppendLine($" - Inner: {ex.InnerException.Message}");
+    }
+
+    return Results.Text(sb.ToString());
+});
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
