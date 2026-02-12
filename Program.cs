@@ -76,5 +76,16 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-app.Run();
+// Configuração de Porta para Railway (e outros serviços cloud)
+var port = Environment.GetEnvironmentVariable("PORT");
+if (!string.IsNullOrEmpty(port))
+{
+    // Se a variável PORT estiver definida (ambiente de produção/cloud), escuta nessa porta
+    app.Run($"http://0.0.0.0:{port}");
+}
+else
+{
+    // Desenvolvimento local
+    app.Run();
+}
 
