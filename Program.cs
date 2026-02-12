@@ -197,7 +197,18 @@ app.MapGet("/debug-railway", async (ApplicationDbContext db) =>
         }
     }
 
-    if (hasPlaceholders)
+    // Detecção se estamos usando a credencial hardcoded (Emergency Mode)
+    // Se a connectionString conter "amabiko", é o nosso fallback
+    var isEmergencyMode = connectionString.Contains("amabiko");
+
+    if (isEmergencyMode)
+    {
+        sb.AppendLine("\n[MODO DE EMERGÊNCIA ATIVADO] 🚑");
+        sb.AppendLine("O sistema ignorou as variáveis quebradas do Railway e usou a conexão de backup.");
+        sb.AppendLine("-> O SITE DEVE FUNCIONAR NORMALMENTE AGORA.");
+        sb.AppendLine("(As variáveis de ambiente continuam quebradas, mas o app está ignorando elas)");
+    }
+    else if (hasPlaceholders)
     {
         sb.AppendLine("\n[ERRO CRÍTICO] O Railway não substituiu as variáveis de ambiente!");
         sb.AppendLine("-> Solução: Vá nas configurações do Railway e adicione manualmente a variável DATABASE_URL com a connection string completa.");
