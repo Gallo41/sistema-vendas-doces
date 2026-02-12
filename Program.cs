@@ -15,18 +15,21 @@ if (!string.IsNullOrEmpty(port))
 builder.Services.AddControllersWithViews();
 
 // Configuração do banco de dados MySQL
+// Tenta ler DATABASE_URL ou MYSQL_URL (Railway costuma usar MYSQL_URL para o plugin)
 var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL");
+if (string.IsNullOrEmpty(connectionString)) connectionString = Environment.GetEnvironmentVariable("MYSQL_URL");
+
 var isRailway = !string.IsNullOrEmpty(connectionString);
 
 if (!isRailway)
 {
     // Local development
-    Console.WriteLine("[DEBUG] Rodando em ambiente LOCAL (ou DATABASE_URL vazia)");
+    Console.WriteLine("[DEBUG] Rodando em ambiente LOCAL (ou variáveis de banco vazias)");
     connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? "";
 }
 else
 {
-    Console.WriteLine("[DEBUG] Rodando em RAILWAY. Processando DATABASE_URL...");
+    Console.WriteLine("[DEBUG] Rodando em RAILWAY. Conexão encontrada!");
     // Fix para Railway: Converter URL mysql:// para connection string padrão
     try 
     {
@@ -57,7 +60,7 @@ else
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"[CRITICAL] Erro ao fazer parse da DATABASE_URL: {ex.Message}");
+        Console.WriteLine($"[CRITICAL] Erro ao fazer parse da URL do banco: {ex.Message}");
     }
 }
 
@@ -66,8 +69,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         connectionString,
         new MySqlServerVersion(new Version(8, 0, 36)),
         mySqlOptions => mySqlOptions.EnableRetryOnFailure(
-            maxRetryCount: 2, // Reduzido para testar rápido
-            maxRetryDelay: TimeSpan.FromSeconds(2),
+            maxRetryCount: 5,
+            maxRetryDelay: TimeSpan.FromSeconds(5),
             errorNumbersToAdd: null)
     ));
 
@@ -78,14 +81,14 @@ using (var scope = app.Services.CreateScope())
 {
     try
     {
-        // ATENÇÃO: Migração comentada para DEBUG. Se o banco não conectar, o app SOBE mesmo assim.
-        // var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        // db.Database.Migrate();
-        Console.WriteLine("[DEBUG] Migração PULADA para garantir startup do container.");
+        // Tenta rodar a migração. Se falhar, loga o erro mas deixa o app subir.
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        db.Database.Migrate();
+        Console.WriteLine("[SUCCESS] Migração do banco realizada com sucesso!");
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"[IGNORED] Erro na inicialização do DB: {ex.Message}");
+        Console.WriteLine($"[IGNORED] Erro na inicialização do DB (o app vai subir mesmo assim): {ex.Message}");
     }
 }
 
