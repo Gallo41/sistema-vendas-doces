@@ -85,10 +85,11 @@ var localizationOptions = new RequestLocalizationOptions()
 app.UseRequestLocalization(localizationOptions);
 
 // Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Home/Error");
-}
+// if (!app.Environment.IsDevelopment())
+// {
+//     app.UseExceptionHandler("/Home/Error");
+// }
+app.UseDeveloperExceptionPage(); // DEBUG: Forçar exibição do erro no Railway
 
 app.UseStaticFiles();
 
