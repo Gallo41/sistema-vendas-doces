@@ -15,11 +15,31 @@ if (string.IsNullOrEmpty(connectionString))
     // Local development - usa appsettings.json
     connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? "";
 }
+else
+{
+    // Fix para Railway: Converter URL mysql:// para connection string padrão
+    // Formato esperado: mysql://user:password@host:port/database
+    try 
+    {
+        var dbUri = new Uri(connectionString);
+        var userInfo = dbUri.UserInfo.Split(':');
+        connectionString = $"Server={dbUri.Host};Port={dbUri.Port};Database={dbUri.AbsolutePath.TrimStart('/')};User={userInfo[0]};Password={userInfo[1]};";
+    }
+    catch (Exception)
+    {
+        // Se falhar o parse (já estiver no formato correto), mantém como está
+        Console.WriteLine("Aviso: Não foi possível fazer o parse da DATABASE_URL como URI. Usando string original.");
+    }
+}
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(
         connectionString,
-        new MySqlServerVersion(new Version(8, 0, 36))
+        new MySqlServerVersion(new Version(8, 0, 36)),
+        mySqlOptions => mySqlOptions.EnableRetryOnFailure(
+            maxRetryCount: 5,
+            maxRetryDelay: TimeSpan.FromSeconds(10),
+            errorNumbersToAdd: null)
     ));
 
 var app = builder.Build();
