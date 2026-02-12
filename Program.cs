@@ -7,27 +7,29 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 // Configuração do banco de dados MySQL
-// Railway define MYSQL_URL automaticamente quando você adiciona MySQL
-var connectionString = Environment.GetEnvironmentVariable("MYSQL_URL");
+// Railway cria essas variáveis automaticamente quando você adiciona MySQL
+var mysqlHost = Environment.GetEnvironmentVariable("MYSQLHOST");
+var connectionString = "";
 
-if (!string.IsNullOrEmpty(connectionString))
+if (!string.IsNullOrEmpty(mysqlHost))
 {
-    // Railway format: mysql://user:password@host:port/database
-    // Pomelo needs: Server=host;Port=port;Database=database;User=user;Password=password
-    var uri = new Uri(connectionString);
-    var userInfo = uri.UserInfo.Split(':');
-    connectionString = $"Server={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};User={userInfo[0]};Password={userInfo[1]};";
+    // Estamos no Railway - usar variáveis individuais
+    var user = Environment.GetEnvironmentVariable("MYSQLUSER");
+    var password = Environment.GetEnvironmentVariable("MYSQLPASSWORD");
+    var database = Environment.GetEnvironmentVariable("MYSQLDATABASE");
+    var port = Environment.GetEnvironmentVariable("MYSQLPORT") ?? "3306";
+    connectionString = $"Server={mysqlHost};Port={port};Database={database};User={user};Password={password};";
 }
 else
 {
     // Local development - usa appsettings.json
-    connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? "";
 }
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(
         connectionString,
-        ServerVersion.AutoDetect(connectionString)
+        new MySqlServerVersion(new Version(8, 0, 36))
     ));
 
 var app = builder.Build();
