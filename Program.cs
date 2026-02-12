@@ -35,7 +35,7 @@ else
         // Decodifica %20, etc se necessário (Uri faz isso, mas garantindo)
         password = Uri.UnescapeDataString(password);
 
-        connectionString = $"Server={dbUri.Host};Port={dbUri.Port};Database={dbUri.AbsolutePath.TrimStart('/')};User={username};Password={password};";
+        connectionString = $"Server={dbUri.Host};Port={dbUri.Port};Database={dbUri.AbsolutePath.TrimStart('/')};User={username};Password={password};SslMode=None;";
     }
     catch (Exception ex)
     {
