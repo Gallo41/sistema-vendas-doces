@@ -26,7 +26,7 @@ if (isRailway && string.IsNullOrEmpty(connectionString))
 {
     Console.WriteLine("[EMERGENCY] Variáveis de ambiente falharam. Usando credenciais de EMERGÊNCIA para salvar o deploy!");
     // Credenciais extraídas do print do usuário - usando URL PÚBLICA (proxy) pois a interna não resolve
-    connectionString = "Server=amabiko.proxy.rlwy.net;Port=48605;Database=railway;Uid=root;Pwd=htBSQtCKGznMPKayosIjXHMl0yNbQwbTA;Protocol=Tcp;SslMode=None";
+    connectionString = "Server=yamabiko.proxy.rlwy.net;Port=48605;Database=railway;Uid=root;Pwd=htBSQtCKGznMPKayosIjXHMl0yNbQwbTA;Protocol=Tcp;SslMode=None";
 }
 
 if (!isRailway && string.IsNullOrEmpty(connectionString))
