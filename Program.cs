@@ -170,18 +170,42 @@ app.MapGet("/debug-railway", async (ApplicationDbContext db) =>
          // Lógica para DATABASE_URL se existisse...
     }
 
-    sb.AppendLine("\nVariáveis de Ambiente (MYSQL*):");
+    // Check for placeholders
+    var hasPlaceholders = false;
+    foreach (System.Collections.DictionaryEntry env in Environment.GetEnvironmentVariables())
+    {
+        var val = env.Value?.ToString() ?? "";
+        if (val.StartsWith("{{") && val.EndsWith("}}"))
+        {
+            hasPlaceholders = true;
+            sb.AppendLine($"[AVISO] A variável {env.Key} contém um placeholder não substituído: {val}");
+        }
+    }
+
+    if (hasPlaceholders)
+    {
+        sb.AppendLine("\n[ERRO CRÍTICO] O Railway não substituiu as variáveis de ambiente!");
+        sb.AppendLine("-> Solução: Vá nas configurações do Railway e adicione manualmente a variável DATABASE_URL com a connection string completa.");
+    }
+    
+    sb.AppendLine("\nVariáveis de Ambiente (MYSQL* + PORT):");
     foreach (System.Collections.DictionaryEntry env in Environment.GetEnvironmentVariables())
     {
         var key = env.Key.ToString();
         if (key.ToUpper().Contains("MYSQL") || key.ToUpper().Contains("DB") || key.ToUpper().Contains("PORT"))
         {
-             var val = env.Value.ToString();
-             // Mascarar senha
-             if (key.ToUpper().Contains("URL") || key.ToUpper().Contains("PASS")) 
-                 val = val.Length > 10 ? val.Substring(0, 10) + "..." : "***";
+             var val = env.Value?.ToString() ?? "";
+             var displayVal = val;
              
-             sb.AppendLine($"- {key} = {val}");
+             // Mascarar senha ou URL longa
+             if (key.ToUpper().Contains("URL") || key.ToUpper().Contains("PASS")) 
+             {
+                 if (string.IsNullOrEmpty(val)) displayVal = "(VAZIO)";
+                 else if (val.StartsWith("{{")) displayVal = val; // Mostrar placeholder
+                 else displayVal = val.Length > 10 ? val.Substring(0, 10) + "..." : "***";
+             }
+             
+             sb.AppendLine($"- {key} = {displayVal}");
         }
     }
 
@@ -195,6 +219,7 @@ app.MapGet("/debug-railway", async (ApplicationDbContext db) =>
         else
         {
             sb.AppendLine("FALHA! CanConnect retornou false.");
+            sb.AppendLine($"String de Conexão usada (host): {new MySqlConnector.MySqlConnectionStringBuilder(connectionString).Server}");
         }
     }
     catch (Exception ex)
