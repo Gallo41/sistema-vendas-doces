@@ -15,6 +15,12 @@
             💰 Registrar Nova Venda
         </div>
         <div class="card-body">
+
+            <!-- PROMOÇÃO PÃO DE MEL -->
+            <div class="promo-banner" style="background: linear-gradient(135deg, var(--pink-accent), var(--purple-bright)); border-radius: 12px; padding: 1rem 1.5rem; margin-bottom: 1.5rem; text-align: center; box-shadow: 0 4px 15px rgba(232,139,167,0.3);">
+                <span style="font-size: 1.3rem; font-weight: bold; color: #fff;">🍯 PROMOÇÃO PÃO DE MEL</span><br/>
+                <span style="color: #fff; font-size: 1rem;">2 unidades por <strong>R$ 15,00</strong> · 3 unidades por <strong>R$ 23,00</strong></span>
+            </div>
             <form asp-action="Create" method="post">
                 <div class="form-group mb-3">
                     <label class="form-label">👤 Cliente</label>
@@ -60,7 +66,7 @@
                                     {
                                         @foreach (var p in produtos)
                                         {
-                                            <option value="@p.Id" data-preco="@p.PrecoVenda" data-estoque="@p.QuantidadeEstoque">
+                                            <option value="@p.Id" data-preco="@p.PrecoVenda" data-estoque="@p.QuantidadeEstoque" data-nome="@p.Nome">
                                                 @p.Nome - R$ @p.PrecoVenda.ToString("N2") (Est: @p.QuantidadeEstoque)
                                             </option>
                                         }
@@ -69,7 +75,7 @@
                             </div>
                             <div class="col-6 col-md-3">
                                 <label class="form-label">Qtd</label>
-                                <input type="number" name="Quantidades" class="form-control qtd-input" value="1" min="1" required onchange="calcularTotal()" />
+                                <input type="number" name="Quantidades" class="form-control qtd-input" value="1" min="1" required onchange="calcularTotal()" data-validate="integer" />
                             </div>
                             <div class="col-6 col-md-3">
                                 <label class="form-label">Subtotal</label>
@@ -115,7 +121,7 @@
                 </div>
                 <div class="col-6 col-md-3">
                     <label class="form-label">Qtd</label>
-                    <input type="number" name="Quantidades" class="form-control qtd-input" value="1" min="1" required onchange="calcularTotal()" />
+                    <input type="number" name="Quantidades" class="form-control qtd-input" value="1" min="1" required onchange="calcularTotal()" data-validate="integer" />
                 </div>
                 <div class="col-6 col-md-3">
                     <label class="form-label">Subtotal</label>
@@ -136,6 +142,31 @@
         calcularTotal();
     }
 
+    function calcularPromoPaoDeMel(quantidade, precoUnitario) {
+        if (quantidade <= 0) return 0;
+        if (quantidade === 1) return precoUnitario;
+        var total = 0;
+        var restante = quantidade;
+        var pacotes3 = Math.floor(restante / 3);
+        restante -= pacotes3 * 3;
+        total += pacotes3 * 23;
+        var pacotes2 = Math.floor(restante / 2);
+        restante -= pacotes2 * 2;
+        total += pacotes2 * 15;
+        total += restante * precoUnitario;
+        var restante2 = quantidade;
+        var total2 = 0;
+        var p2 = Math.floor(restante2 / 2);
+        restante2 -= p2 * 2;
+        total2 += p2 * 15;
+        total2 += restante2 * precoUnitario;
+        return Math.min(total, total2);
+    }
+
+    function ehPaoDeMel(nome) {
+        return nome && nome.toLowerCase().indexOf('pão de mel') >= 0;
+    }
+
     function calcularTotal() {
         var total = 0;
         var rows = document.querySelectorAll('.item-row');
@@ -147,9 +178,20 @@
             if (select.value && select.value !== '0' && qtd.value > 0) {
                 var option = select.options[select.selectedIndex];
                 var preco = parseFloat(option.getAttribute('data-preco').replace(',', '.')) || 0;
-                var subtotal = preco * parseInt(qtd.value);
+                var nome = option.getAttribute('data-nome') || '';
+                var quantidade = parseInt(qtd.value);
+                var subtotal;
+
+                if (ehPaoDeMel(nome) && quantidade >= 2) {
+                    subtotal = calcularPromoPaoDeMel(quantidade, preco);
+                    var economia = (quantidade * preco) - subtotal;
+                    display.innerHTML = 'R$ ' + subtotal.toFixed(2).replace('.', ',') + 
+                        '<br><small style="color: var(--pink-accent); font-size: 0.75rem;">🍯 Promo! -R$' + economia.toFixed(2).replace('.', ',') + '</small>';
+                } else {
+                    subtotal = preco * quantidade;
+                    display.textContent = 'R$ ' + subtotal.toFixed(2).replace('.', ',');
+                }
                 total += subtotal;
-                display.textContent = 'R$ ' + subtotal.toFixed(2).replace('.', ',');
             } else {
                 display.textContent = 'R$ 0,00';
             }

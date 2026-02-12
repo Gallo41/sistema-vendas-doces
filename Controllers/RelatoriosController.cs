@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SistemaVendasDoces.Data;
 using SistemaVendasDoces.Models;
+using SistemaVendasDoces.Models.ViewModels;
 
 namespace SistemaVendasDoces.Controllers
 {
@@ -18,6 +19,61 @@ namespace SistemaVendasDoces.Controllers
         public IActionResult Index()
         {
             return View();
+        }
+
+        // GET: Relatorios/ProducaoPedidos
+        public async Task<IActionResult> ProducaoPedidos()
+        {
+            // Buscar pedidos pendentes e em produção
+            var pedidos = await _context.Pedidos
+                .Include(p => p.Cliente)
+                .Include(p => p.Itens)
+                .ThenInclude(i => i.Produto)
+                .Where(p => p.Status == StatusPedido.Pendente || p.Status == StatusPedido.EmProducao)
+                .OrderBy(p => p.DataPedido)
+                .ToListAsync();
+
+            // Agrupar todos os itens por produto para resumo de produção
+            var todosItens = pedidos
+                .SelectMany(p => p.Itens)
+                .GroupBy(i => i.ProdutoId)
+                .Select(g => new ItemProducao
+                {
+                    NomeProduto = g.First().Produto?.Nome ?? "Produto desconhecido",
+                    QuantidadeNecessaria = g.Sum(i => i.Quantidade),
+                    EstoqueAtual = g.First().Produto?.QuantidadeEstoque ?? 0
+                })
+                .OrderByDescending(i => i.QuantidadeNecessaria)
+                .ToList();
+
+            // Montar lista de pedidos com itens
+            var pedidosProducao = pedidos.Select(p => new PedidoProducao
+            {
+                PedidoId = p.Id,
+                ClienteNome = p.Cliente?.Nome ?? "Cliente desconhecido",
+                DataPedido = p.DataPedido,
+                DataEntrega = p.DataEntrega,
+                Status = p.Status.ToString(),
+                ValorTotal = p.ValorTotal,
+                Observacoes = p.Observacoes,
+                Itens = p.Itens.Select(i => new ItemPedidoProducao
+                {
+                    NomeProduto = i.Produto?.Nome ?? "Produto desconhecido",
+                    Quantidade = i.Quantidade,
+                    PrecoUnitario = i.PrecoUnitario,
+                    Subtotal = i.Subtotal
+                }).ToList()
+            }).ToList();
+
+            var viewModel = new RelatorioProducaoViewModel
+            {
+                ResumoProducao = todosItens,
+                Pedidos = pedidosProducao,
+                TotalPedidos = pedidos.Count,
+                TotalUnidades = todosItens.Sum(i => i.QuantidadeNecessaria)
+            };
+
+            return View(viewModel);
         }
 
         // GET: Relatorios/SaboresMaisVendidos
@@ -75,3 +131,4 @@ namespace SistemaVendasDoces.Controllers
         }
     }
 }
+

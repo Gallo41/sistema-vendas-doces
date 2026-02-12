@@ -25,25 +25,25 @@
 
                 <div class="form-group">
                     <label asp-for="PrecoVenda" class="form-label">Preço de Venda *</label>
-                    <input asp-for="PrecoVenda" class="form-control" type="text" inputmode="decimal" placeholder="0,00" />
+                    <input asp-for="PrecoVenda" class="form-control" type="text" inputmode="decimal" placeholder="0,00" data-validate="number" />
                     <span asp-validation-for="PrecoVenda" class="text-danger"></span>
                 </div>
 
                 <div class="form-group">
                     <label asp-for="PrecoCusto" class="form-label">Preço de Custo</label>
-                    <input asp-for="PrecoCusto" class="form-control" type="text" inputmode="decimal" placeholder="0,00" />
+                    <input asp-for="PrecoCusto" class="form-control" type="text" inputmode="decimal" placeholder="0,00" data-validate="number" />
                     <span asp-validation-for="PrecoCusto" class="text-danger"></span>
                 </div>
 
                 <div class="form-group">
                     <label asp-for="QuantidadeEstoque" class="form-label">Quantidade em Estoque *</label>
-                    <input asp-for="QuantidadeEstoque" class="form-control" type="number" placeholder="0" />
+                    <input asp-for="QuantidadeEstoque" class="form-control" type="number" placeholder="0" data-validate="integer" />
                     <span asp-validation-for="QuantidadeEstoque" class="text-danger"></span>
                 </div>
 
                 <div class="form-group">
                     <label asp-for="EstoqueMinimo" class="form-label">Estoque Mínimo (Alerta)</label>
-                    <input asp-for="EstoqueMinimo" class="form-control" type="number" placeholder="0" />
+                    <input asp-for="EstoqueMinimo" class="form-control" type="number" placeholder="0" data-validate="integer" />
                     <span asp-validation-for="EstoqueMinimo" class="text-danger"></span>
                 </div>
 

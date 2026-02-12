@@ -88,7 +88,18 @@ namespace SistemaVendasDoces.Controllers
                 var produto = await _context.Produtos.FindAsync(produtoIds[i]);
                 if (produto != null && quantidades[i] > 0)
                 {
-                    var subtotal = produto.PrecoVenda * quantidades[i];
+                    decimal subtotal;
+
+                    // Promoção Pão de Mel: 2 por R$15, 3 por R$23
+                    if (produto.Nome.Contains("Pão de Mel", StringComparison.OrdinalIgnoreCase) && quantidades[i] >= 2)
+                    {
+                        subtotal = CalcularPromoPaoDeMel(quantidades[i], produto.PrecoVenda);
+                    }
+                    else
+                    {
+                        subtotal = produto.PrecoVenda * quantidades[i];
+                    }
+
                     itens.Add(new ItemPedido
                     {
                         ProdutoId = produtoIds[i],
@@ -248,6 +259,33 @@ namespace SistemaVendasDoces.Controllers
         private bool PedidoExists(int id)
         {
             return _context.Pedidos.Any(e => e.Id == id);
+        }
+
+        private decimal CalcularPromoPaoDeMel(int quantidade, decimal precoUnitario)
+        {
+            if (quantidade <= 0) return 0;
+            if (quantidade == 1) return precoUnitario;
+
+            // Opção 1: pacotes de 3 (R$23) + pacotes de 2 (R$15) + unidades soltas
+            int restante1 = quantidade;
+            decimal total1 = 0;
+            int pacotes3 = restante1 / 3;
+            restante1 -= pacotes3 * 3;
+            total1 += pacotes3 * 23m;
+            int pacotes2a = restante1 / 2;
+            restante1 -= pacotes2a * 2;
+            total1 += pacotes2a * 15m;
+            total1 += restante1 * precoUnitario;
+
+            // Opção 2: só pacotes de 2 (R$15) + unidades soltas
+            int restante2 = quantidade;
+            decimal total2 = 0;
+            int pacotes2b = restante2 / 2;
+            restante2 -= pacotes2b * 2;
+            total2 += pacotes2b * 15m;
+            total2 += restante2 * precoUnitario;
+
+            return Math.Min(total1, total2);
         }
     }
 }

@@ -10,6 +10,13 @@
             ➕ Novo Pedido
         </div>
         <div class="card-body">
+
+            <!-- PROMOÇÃO PÃO DE MEL -->
+            <div class="promo-banner" style="background: linear-gradient(135deg, var(--pink-accent), var(--purple-bright)); border-radius: 12px; padding: 1rem 1.5rem; margin-bottom: 1.5rem; text-align: center; box-shadow: 0 4px 15px rgba(232,139,167,0.3);">
+                <span style="font-size: 1.3rem; font-weight: bold; color: #fff;">🍯 PROMOÇÃO PÃO DE MEL</span><br/>
+                <span style="color: #fff; font-size: 1rem;">2 unidades por <strong>R$ 15,00</strong> · 3 unidades por <strong>R$ 23,00</strong></span>
+            </div>
+
             <form asp-action="Create" method="post">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
@@ -28,10 +35,14 @@
                         {
                             <div class="form-check mb-2">
                                 <div class="row align-items-center">
-                                    <div class="col-md-6">
+                                    <div class="col-md-5">
                                         <label class="form-check-label">
                                             <strong>@produto.Nome</strong> - R$ @produto.PrecoVenda.ToString("N2")
-                                            <small class="text-muted">(Estoque: @produto.QuantidadeEstoque)</small>
+                                            <small style="color: #34d399 !important;">(Estoque: @produto.QuantidadeEstoque)</small>
+                                            @if (produto.Nome.IndexOf("Pão de Mel", StringComparison.OrdinalIgnoreCase) >= 0)
+                                            {
+                                                <span class="badge" style="background: var(--pink-accent); color: #fff; font-size: 0.7rem; margin-left: 5px;">🍯 PROMO</span>
+                                            }
                                         </label>
                                     </div>
                                     <div class="col-md-3">
@@ -43,8 +54,13 @@
                                                max="@produto.QuantidadeEstoque"
                                                value="0" 
                                                data-preco="@produto.PrecoVenda"
+                                               data-nome="@produto.Nome"
                                                onchange="atualizarTotal()">
                                         <input type="hidden" name="produtoIds" value="@produto.Id">
+                                        <small class="promo-info" style="color: var(--pink-accent); display: none; font-size: 0.8rem; margin-top: 4px;"></small>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <span class="subtotal-pedido" style="font-weight: bold; color: var(--purple-lightest);"></span>
                                     </div>
                                 </div>
                             </div>
@@ -71,13 +87,72 @@
 </div>
 
 <script>
+function calcularPromoPaoDeMel(quantidade, precoUnitario) {
+    if (quantidade <= 0) return 0;
+    if (quantidade === 1) return precoUnitario;
+
+    var total = 0;
+    var restante = quantidade;
+
+    // Prioriza pacotes de 3 (R$23) e depois pacotes de 2 (R$15)
+    var pacotes3 = Math.floor(restante / 3);
+    restante -= pacotes3 * 3;
+    total += pacotes3 * 23;
+
+    var pacotes2 = Math.floor(restante / 2);
+    restante -= pacotes2 * 2;
+    total += pacotes2 * 15;
+
+    total += restante * precoUnitario;
+
+    // Verifica se usar só pacotes de 2 seria mais barato
+    var restante2 = quantidade;
+    var total2 = 0;
+    var p2 = Math.floor(restante2 / 2);
+    restante2 -= p2 * 2;
+    total2 += p2 * 15;
+    total2 += restante2 * precoUnitario;
+
+    return Math.min(total, total2);
+}
+
+function ehPaoDeMel(nome) {
+    return nome && nome.toLowerCase().indexOf('pão de mel') >= 0;
+}
+
 function atualizarTotal() {
     let total = 0;
     const quantidadeInputs = document.querySelectorAll('input[name="quantidades"]');
     quantidadeInputs.forEach(input => {
         const quantidade = parseInt(input.value) || 0;
         const preco = parseFloat(input.dataset.preco) || 0;
-        total += quantidade * preco;
+        const nome = input.dataset.nome || '';
+        const promoInfo = input.parentElement.querySelector('.promo-info');
+        const subtotalDisplay = input.closest('.row').querySelector('.subtotal-pedido');
+
+        var subtotal = 0;
+
+        if (quantidade > 0) {
+            if (ehPaoDeMel(nome) && quantidade >= 2) {
+                subtotal = calcularPromoPaoDeMel(quantidade, preco);
+                var economizado = (quantidade * preco) - subtotal;
+                if (promoInfo) {
+                    promoInfo.style.display = 'block';
+                    promoInfo.textContent = '🍯 Promo! Economia: R$ ' + economizado.toFixed(2).replace('.', ',');
+                }
+            } else {
+                subtotal = quantidade * preco;
+                if (promoInfo) promoInfo.style.display = 'none';
+            }
+        } else {
+            if (promoInfo) promoInfo.style.display = 'none';
+        }
+
+        if (subtotalDisplay) {
+            subtotalDisplay.textContent = subtotal > 0 ? 'R$ ' + subtotal.toFixed(2).replace('.', ',') : '';
+        }
+
+        total += subtotal;
     });
     document.getElementById('valor-total').textContent = total.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }

@@ -11,6 +11,10 @@
     --purple-lighter: #C77DFF;
     --purple-lightest: #E0AAFF;
 
+    --pink-accent: #E88BA7;
+    --pink-light: #F2B5C8;
+    --pink-dark: #D4668A;
+
     --bg-dark: #0f0f23;
     --bg-card: #1a1a2e;
     --text-light: #ffffff;
@@ -57,6 +61,33 @@ body {
 
 .navbar-brand:hover {
     transform: scale(1.05);
+}
+
+.navbar-logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    object-fit: contain;
+    background: white;
+    padding: 3px;
+    box-shadow: 0 2px 8px rgba(232, 139, 167, 0.4);
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.navbar-logo:hover {
+    transform: scale(1.08);
+    box-shadow: 0 4px 12px rgba(232, 139, 167, 0.6);
+}
+
+.brand-text {
+    font-size: 1.1rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--pink-accent), var(--purple-lighter));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    white-space: nowrap;
 }
 
 .nav-link {
@@ -397,7 +428,7 @@ input:-webkit-autofill:active {
     text-align: center;
     padding: 2rem;
     margin-top: 4rem;
-    border-top: 3px solid var(--purple-primary);
+    border-top: 3px solid var(--pink-accent);
 }
 
 /* ========================================
@@ -548,4 +579,95 @@ input:-webkit-autofill:active {
 
 .gap-2 {
     gap: 0.5rem;
+}
+
+/* ========================================
+   VALIDAÇÃO DE FORMULÁRIOS
+   ======================================== */
+.field-error {
+    display: block;
+    color: #f87171;
+    font-size: 0.8rem;
+    margin-top: 0.35rem;
+    font-weight: 500;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.input-error {
+    border-color: #ef4444 !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.25) !important;
+}
+
+/* ========================================
+   RELATÓRIO DE PRODUÇÃO
+   ======================================== */
+.producao-resumo {
+    background: linear-gradient(135deg, var(--purple-medium) 0%, var(--purple-primary) 100%);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 32px var(--shadow);
+}
+
+.producao-resumo h4 {
+    color: var(--purple-lightest);
+    margin-bottom: 1rem;
+}
+
+.producao-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    margin-bottom: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.producao-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(5px);
+}
+
+.producao-item .nome {
+    font-weight: 600;
+    color: var(--text-light);
+}
+
+.producao-item .quantidade {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--purple-lightest);
+    background: rgba(123, 44, 191, 0.3);
+    padding: 0.3rem 1rem;
+    border-radius: 20px;
+}
+
+.producao-item .estoque-info {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.producao-item .estoque-baixo {
+    color: #f87171;
+    font-weight: bold;
+}
+
+.pedido-producao-card {
+    background: var(--bg-card);
+    border: 1px solid var(--purple-primary);
+    border-radius: 16px;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.pedido-producao-card .card-header {
+    padding: 1rem 1.5rem;
+    font-size: 1.1rem;
+}
+
+.pedido-producao-card .card-body {
+    padding: 1.5rem;
 }

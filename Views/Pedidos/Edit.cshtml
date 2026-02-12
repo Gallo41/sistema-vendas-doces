@@ -26,7 +26,7 @@
                         <h5>Informações de Pagamento</h5>
                         <div class="form-group mb-3">
                             <label class="control-label">Registrar Pagamento</label>
-                            <input type="text" inputmode="decimal" name="novoPagamento" class="form-control" placeholder="R$ 0,00" />
+                            <input type="text" inputmode="decimal" name="novoPagamento" class="form-control" placeholder="R$ 0,00" data-validate="number" />
                             <small class="text-muted">Valor Total: R$ @Model.ValorTotal.ToString("N2") | Pago: R$ @Model.ValorPago.ToString("N2") | Pendente: R$ @Model.ValorPendente.ToString("N2")</small>
                         </div>
                         <div class="form-group mb-3">

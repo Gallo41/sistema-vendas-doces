@@ -1,0 +1,108 @@
+@model SistemaVendasDoces.Models.ViewModels.RelatorioProducaoViewModel
+@using SistemaVendasDoces.Helpers
+
+@{
+    ViewData["Title"] = "Produção de Pedidos";
+}
+
+<div class="container">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <span>📦 Relatório de Produção</span>
+            <a asp-action="Index" class="btn btn-secondary">↩️ Voltar</a>
+        </div>
+        <div class="card-body">
+
+            @if (Model.TotalPedidos == 0)
+            {
+                <div class="alert alert-info text-center">
+                    <h3>🎉 Nenhum pedido pendente de produção!</h3>
+                    <p>Todos os pedidos foram produzidos e entregues.</p>
+                </div>
+            }
+            else
+            {
+                <!-- RESUMO GERAL - O que precisa ser produzido -->
+                <div class="producao-resumo">
+                    <h4>🍫 Resumo Geral — O que Produzir</h4>
+                    <p style="color: var(--text-muted); margin-bottom: 1rem;">
+                        <strong>@Model.TotalPedidos</strong> pedido(s) pendente(s) · <strong>@Model.TotalUnidades</strong> unidade(s) no total
+                    </p>
+
+                    @foreach (var item in Model.ResumoProducao)
+                    {
+                        <div class="producao-item">
+                            <div>
+                                <span class="nome">🍬 @item.NomeProduto</span>
+                                <br />
+                                <span class="estoque-info">
+                                    Estoque atual: <strong>@item.EstoqueAtual</strong>
+                                    @if (!item.EstoqueSuficiente)
+                                    {
+                                        <span class="estoque-baixo"> ⚠️ Faltam @Math.Abs(item.Diferenca) unidade(s)!</span>
+                                    }
+                                    else
+                                    {
+                                        <span style="color: #34d399;"> ✅ Estoque OK (sobram @item.Diferenca)</span>
+                                    }
+                                </span>
+                            </div>
+                            <span class="quantidade">@item.QuantidadeNecessaria un.</span>
+                        </div>
+                    }
+                </div>
+
+                <hr style="border-color: var(--purple-primary); margin: 2rem 0;" />
+
+                <!-- DETALHES POR PEDIDO -->
+                <h4 style="color: var(--purple-lightest); margin-bottom: 1.5rem;">📋 Detalhes por Pedido</h4>
+
+                @foreach (var pedido in Model.Pedidos)
+                {
+                    <div class="pedido-producao-card">
+                        <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <span>
+                                📋 Pedido #@pedido.PedidoId — @pedido.ClienteNome
+                            </span>
+                            <span class="badge @(pedido.Status == "Pendente" ? "badge-danger" : "badge-success")">
+                                @(pedido.Status == "Pendente" ? "⏳ Pendente" : "🔧 Em Produção")
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <p style="color: var(--text-muted); margin-bottom: 1rem;">
+                                📅 Data: <strong>@pedido.DataPedido.ToString("dd/MM/yyyy")</strong>
+                                · 💰 Total: <strong>R$ @pedido.ValorTotal.ToString("N2")</strong>
+                                @if (!string.IsNullOrEmpty(pedido.Observacoes))
+                                {
+                                    <span> · 📝 @pedido.Observacoes</span>
+                                }
+                            </p>
+
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Produto</th>
+                                        <th>Quantidade</th>
+                                        <th>Preço Un.</th>
+                                        <th>Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in pedido.Itens)
+                                    {
+                                        <tr>
+                                            <td data-label="Produto">🍬 @item.NomeProduto</td>
+                                            <td data-label="Qtd"><strong>@item.Quantidade un.</strong></td>
+                                            <td data-label="Preço Un.">R$ @item.PrecoUnitario.ToString("N2")</td>
+                                            <td data-label="Subtotal">R$ @item.Subtotal.ToString("N2")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>

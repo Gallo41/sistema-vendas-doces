@@ -1,6 +1,6 @@
 {
-    "name": "Sistema de Vendas de Doces",
-    "short_name": "Doces Sales",
+    "name": "MAECaseira Doces",
+    "short_name": "MAECaseira",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#10002B",
