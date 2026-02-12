@@ -33,10 +33,13 @@ else
         var password = userInfo.Length > 1 ? userInfo[1] : "";
         password = Uri.UnescapeDataString(password);
 
+        var headerPort = dbUri.Port;
+        if (headerPort == -1) headerPort = 3306;
+
         var builderStr = new MySqlConnector.MySqlConnectionStringBuilder
         {
             Server = dbUri.Host,
-            Port = (uint)dbUri.Port,
+            Port = (uint)headerPort,
             Database = dbUri.AbsolutePath.TrimStart('/'),
             UserID = username,
             Password = password,
