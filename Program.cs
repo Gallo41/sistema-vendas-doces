@@ -43,14 +43,14 @@ else
             Database = dbUri.AbsolutePath.TrimStart('/'),
             UserID = username,
             Password = password,
-            SslMode = MySqlConnector.MySqlSslMode.None, // Garantir compatibilidade total
-            AllowPublicKeyRetrieval = true // Necessário para alguns servidores MySQL
+            SslMode = MySqlConnector.MySqlSslMode.None,
+            AllowPublicKeyRetrieval = true,
+            ConnectionTimeout = 5 // Fail fast (5 segundos) para não travar o deploy
         };
 
         connectionString = builderStr.ConnectionString;
         
-        // Log para debug (sem mostrar a senha)
-        Console.WriteLine($"[DEBUG] Conectando em: Server={builderStr.Server};Port={builderStr.Port};Database={builderStr.Database};User={builderStr.UserID};SslMode={builderStr.SslMode}");
+        Console.WriteLine($"[DEBUG] Conectando em: Server={builderStr.Server};Port={builderStr.Port};User={builderStr.UserID};Ssl={builderStr.SslMode}");
     }
     catch (Exception ex)
     {
@@ -63,29 +63,26 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         connectionString,
         new MySqlServerVersion(new Version(8, 0, 36)),
         mySqlOptions => mySqlOptions.EnableRetryOnFailure(
-            maxRetryCount: 5,
-            maxRetryDelay: TimeSpan.FromSeconds(10),
+            maxRetryCount: 3, // Menos retentativas no startup
+            maxRetryDelay: TimeSpan.FromSeconds(3),
             errorNumbersToAdd: null)
     ));
 
 var app = builder.Build();
 
 // Auto-migrate database on startup
-// BLOCO TRY-CATCH para evitar que o app caia se o banco falhar (permite ver logs)
 using (var scope = app.Services.CreateScope())
 {
     try
     {
-        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        db.Database.Migrate();
+        // ATENÇÃO: Migração comentada temporariamente para garantir que o App inicie e mostre erros na tela
+        // var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        // db.Database.Migrate();
+        Console.WriteLine("Migração automática ignorada para debug de conexão.");
     }
     catch (Exception ex)
     {
-        Console.WriteLine("------------------------------------------");
-        Console.WriteLine("ERRO CRÍTICO NA MIGRAÇÃO DO BANCO DE DADOS:");
-        Console.WriteLine(ex.Message);
-        Console.WriteLine("------------------------------------------");
-        // Não relança a exceção para permitir que a aplicação suba e responda ao Health Check
+        Console.WriteLine($"Erro na inicialização do DB: {ex.Message}");
     }
 }
 
