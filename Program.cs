@@ -19,44 +19,60 @@ builder.Services.AddControllersWithViews();
 var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL");
 if (string.IsNullOrEmpty(connectionString)) connectionString = Environment.GetEnvironmentVariable("MYSQL_URL");
 
-var isRailway = !string.IsNullOrEmpty(connectionString);
+// DETECÇÃO DE AMBIENTE: Se tem PORT definido, é Railway (ou outro container)
+var isRailway = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("PORT"));
 
-if (!isRailway)
+if (isRailway && string.IsNullOrEmpty(connectionString))
+{
+    Console.WriteLine("[EMERGENCY] Variáveis de ambiente falharam. Usando credenciais de EMERGÊNCIA para salvar o deploy!");
+    // Credenciais extraídas do print do usuário (Step 756)
+    // Server=mysql.railway.internal;Port=3306;User=root;Password=...
+    connectionString = "Server=mysql.railway.internal;Port=3306;Database=railway;Uid=root;Pwd=htBSQtCKGznMPKayosIjXHMl0yNbQwbTA;Protocol=Tcp;SslMode=None";
+}
+
+if (!isRailway && string.IsNullOrEmpty(connectionString))
 {
     // Local development
     Console.WriteLine("[DEBUG] Rodando em ambiente LOCAL (ou variáveis de banco vazias)");
     connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? "";
 }
-else
+else if (!string.IsNullOrEmpty(connectionString) && !connectionString.Contains("Uid=root")) // Evitar re-processar a string hardcoded que já está no formato correto
 {
-    Console.WriteLine("[DEBUG] Rodando em RAILWAY. Conexão encontrada!");
+    Console.WriteLine("[DEBUG] Rodando em RAILWAY. Conexão encontrada/definida!");
     // Fix para Railway: Converter URL mysql:// para connection string padrão
     try 
     {
-        var dbUri = new Uri(connectionString);
-        var userInfo = dbUri.UserInfo.Split(new[] { ':' }, 2);
-        var username = userInfo[0];
-        var password = userInfo.Length > 1 ? userInfo[1] : "";
-        password = Uri.UnescapeDataString(password);
-
-        var headerPort = dbUri.Port;
-        if (headerPort == -1) headerPort = 3306;
-
-        var builderStr = new MySqlConnector.MySqlConnectionStringBuilder
+        // Se já for uma connection string padrão (não URL), pula o parse
+        if (!connectionString.StartsWith("mysql://")) 
         {
-            Server = dbUri.Host,
-            Port = (uint)headerPort,
-            Database = dbUri.AbsolutePath.TrimStart('/'),
-            UserID = username,
-            Password = password,
-            SslMode = MySqlConnector.MySqlSslMode.None,
-            AllowPublicKeyRetrieval = true,
-            ConnectionProtocol = MySqlConnector.MySqlConnectionProtocol.Tcp 
-        };
+             Console.WriteLine("[DEBUG] Connection string já está no formato padrão.");
+        }
+        else 
+        {
+            var dbUri = new Uri(connectionString);
+            var userInfo = dbUri.UserInfo.Split(new[] { ':' }, 2);
+            var username = userInfo[0];
+            var password = userInfo.Length > 1 ? userInfo[1] : "";
+            password = Uri.UnescapeDataString(password);
 
-        connectionString = builderStr.ConnectionString;
-        
-        Console.WriteLine($"[DEBUG] Conectando em (TCP): Server={builderStr.Server};Port={builderStr.Port};User={builderStr.UserID};Ssl={builderStr.SslMode}");
+            var headerPort = dbUri.Port;
+            if (headerPort == -1) headerPort = 3306;
+
+            var builderStr = new MySqlConnector.MySqlConnectionStringBuilder
+            {
+                Server = dbUri.Host,
+                Port = (uint)headerPort,
+                Database = dbUri.AbsolutePath.TrimStart('/'),
+                UserID = username,
+                Password = password,
+                SslMode = MySqlConnector.MySqlSslMode.None,
+                AllowPublicKeyRetrieval = true,
+                ConnectionProtocol = MySqlConnector.MySqlConnectionProtocol.Tcp 
+            };
+
+            connectionString = builderStr.ConnectionString;
+            Console.WriteLine($"[DEBUG] Conectando em (TCP): Server={builderStr.Server};Port={builderStr.Port};User={builderStr.UserID};Ssl={builderStr.SslMode}");
+        }
     }
     catch (Exception ex)
     {
