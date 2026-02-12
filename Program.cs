@@ -7,20 +7,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 // Configuração do banco de dados MySQL
-// Railway cria essas variáveis automaticamente quando você adiciona MySQL
-var mysqlHost = Environment.GetEnvironmentVariable("MYSQLHOST");
-var connectionString = "";
+// No Railway: adicionar variável DATABASE_URL com a connection string
+var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL");
 
-if (!string.IsNullOrEmpty(mysqlHost))
-{
-    // Estamos no Railway - usar variáveis individuais
-    var user = Environment.GetEnvironmentVariable("MYSQLUSER");
-    var password = Environment.GetEnvironmentVariable("MYSQLPASSWORD");
-    var database = Environment.GetEnvironmentVariable("MYSQLDATABASE");
-    var port = Environment.GetEnvironmentVariable("MYSQLPORT") ?? "3306";
-    connectionString = $"Server={mysqlHost};Port={port};Database={database};User={user};Password={password};";
-}
-else
+if (string.IsNullOrEmpty(connectionString))
 {
     // Local development - usa appsettings.json
     connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? "";
