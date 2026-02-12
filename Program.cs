@@ -25,9 +25,8 @@ var isRailway = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("PORT")
 if (isRailway && string.IsNullOrEmpty(connectionString))
 {
     Console.WriteLine("[EMERGENCY] Variáveis de ambiente falharam. Usando credenciais de EMERGÊNCIA para salvar o deploy!");
-    // Credenciais extraídas do print do usuário (Step 756)
-    // Server=mysql.railway.internal;Port=3306;User=root;Password=...
-    connectionString = "Server=mysql.railway.internal;Port=3306;Database=railway;Uid=root;Pwd=htBSQtCKGznMPKayosIjXHMl0yNbQwbTA;Protocol=Tcp;SslMode=None";
+    // Credenciais extraídas do print do usuário - usando URL PÚBLICA (proxy) pois a interna não resolve
+    connectionString = "Server=amabiko.proxy.rlwy.net;Port=48605;Database=railway;Uid=root;Pwd=htBSQtCKGznMPKayosIjXHMl0yNbQwbTA;Protocol=Tcp;SslMode=None";
 }
 
 if (!isRailway && string.IsNullOrEmpty(connectionString))
