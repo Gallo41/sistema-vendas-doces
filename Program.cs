@@ -33,10 +33,21 @@ else
         var password = userInfo.Length > 1 ? userInfo[1] : "";
         password = Uri.UnescapeDataString(password);
 
-        connectionString = $"Server={dbUri.Host};Port={dbUri.Port};Database={dbUri.AbsolutePath.TrimStart('/')};User={username};Password={password};SslMode=Preferred;";
+        var builderStr = new MySqlConnector.MySqlConnectionStringBuilder
+        {
+            Server = dbUri.Host,
+            Port = (uint)dbUri.Port,
+            Database = dbUri.AbsolutePath.TrimStart('/'),
+            UserID = username,
+            Password = password,
+            SslMode = MySqlConnector.MySqlSslMode.None, // Garantir compatibilidade total
+            AllowPublicKeyRetrieval = true // Necessário para alguns servidores MySQL
+        };
+
+        connectionString = builderStr.ConnectionString;
         
         // Log para debug (sem mostrar a senha)
-        Console.WriteLine($"Tentando conectar em: Server={dbUri.Host};Port={dbUri.Port};Database={dbUri.AbsolutePath.TrimStart('/')};User={username};SslMode=Preferred");
+        Console.WriteLine($"[DEBUG] Conectando em: Server={builderStr.Server};Port={builderStr.Port};Database={builderStr.Database};User={builderStr.UserID};SslMode={builderStr.SslMode}");
     }
     catch (Exception ex)
     {
