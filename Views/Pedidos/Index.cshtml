@@ -1,0 +1,70 @@
+@model IEnumerable<Pedido>
+@using SistemaVendasDoces.Helpers
+
+@{
+    ViewData["Title"] = "Pedidos";
+}
+
+<div class="container">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span>🛍️ Lista de Pedidos</span>
+            <a asp-action="Create" class="btn btn-success">➕ Novo Pedido</a>
+        </div>
+        <div class="card-body">
+            @if (Model != null && Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Cliente</th>
+                                <th>Data</th>
+                                <th>Total</th>
+                                <th>Status Pag.</th>
+                                <th>Status Pedido</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var pedido in Model)
+                            {
+                                <tr>
+                                    <td data-label="#">@pedido.Id</td>
+                                    <td data-label="Cliente">@pedido.Cliente?.Nome</td>
+                                    <td data-label="Data">@pedido.DataPedido.ToString("dd/MM/yyyy")</td>
+                                    <td data-label="Total">R$ @pedido.ValorTotal.ToString("N2")</td>
+                                    <td data-label="Status Pag.">
+                                        <span class="badge badge-pagamento-@pedido.StatusPagamento.ToString().ToLower()">
+                                            @pedido.StatusPagamento.GetDisplayName()
+                                        </span>
+                                    </td>
+                                    <td data-label="Status Pedido">
+                                        <span class="badge badge-status-@pedido.Status.ToString().ToLower()">
+                                            @pedido.Status.GetDisplayName()
+                                        </span>
+                                    </td>
+                                    <td data-label="Ações">
+                                        <div class="d-flex gap-2">
+                                            <a asp-action="Details" asp-route-id="@pedido.Id" class="btn btn-primary btn-sm">👁️ Ver</a>
+                                            <a asp-action="Edit" asp-route-id="@pedido.Id" class="btn btn-warning btn-sm">✏️ Editar</a>
+                                            <a asp-action="Delete" asp-route-id="@pedido.Id" class="btn btn-danger btn-sm">🗑️ Excluir</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info text-center">
+                    <h3>🛍️ Nenhum pedido registrado ainda</h3>
+                    <p>Clique no botão "Novo Pedido" para registrar uma venda!</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>

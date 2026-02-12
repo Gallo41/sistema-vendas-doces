@@ -1,0 +1,74 @@
+@model Produto
+
+@{
+    ViewData["Title"] = "Detalhes do Produto";
+}
+
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            👁️ Detalhes do Produto
+        </div>
+        <div class="card-body">
+            <h2 style="color: var(--purple-lightest);">@Model.Nome</h2>
+            
+            @if (!string.IsNullOrEmpty(Model.Descricao))
+            {
+                <p style="margin-top: 1rem; font-size: 1.1rem;">@Model.Descricao</p>
+            }
+
+            <div style="margin-top: 2rem;">
+                <div class="form-group">
+                    <strong>💰 Preço de Venda:</strong> R$ @Model.PrecoVenda.ToString("N2")
+                </div>
+
+                @if (Model.PrecoCusto.HasValue)
+                {
+                    <div class="form-group">
+                        <strong>💵 Preço de Custo:</strong> R$ @Model.PrecoCusto.Value.ToString("N2")
+                    </div>
+                    <div class="form-group">
+                        <strong>📊 Margem de Lucro:</strong> R$ @((Model.PrecoVenda - Model.PrecoCusto.Value).ToString("N2"))
+                    </div>
+                }
+
+                <div class="form-group">
+                    <strong>📦 Quantidade em Estoque:</strong> @Model.QuantidadeEstoque unidades
+                    @if (Model.EstoqueMinimo.HasValue && Model.QuantidadeEstoque <= Model.EstoqueMinimo)
+                    {
+                        <span class="badge badge-danger">⚠️ Estoque Baixo</span>
+                    }
+                </div>
+
+                @if (Model.EstoqueMinimo.HasValue)
+                {
+                    <div class="form-group">
+                        <strong>⚠️ Estoque Mínimo:</strong> @Model.EstoqueMinimo unidades
+                    </div>
+                }
+
+                <div class="form-group">
+                    <strong>📅 Data de Cadastro:</strong> @Model.DataCadastro.ToString("dd/MM/yyyy HH:mm")
+                </div>
+
+                <div class="form-group">
+                    <strong>Status:</strong>
+                    @if (Model.Ativo)
+                    {
+                        <span class="badge badge-success">✓ Ativo</span>
+                    }
+                    else
+                    {
+                        <span class="badge badge-danger">✗ Inativo</span>
+                    }
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 mt-3">
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">✏️ Editar</a>
+                <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">🗑️ Excluir</a>
+                <a asp-action="Index" class="btn btn-secondary">↩️ Voltar</a>
+            </div>
+        </div>
+    </div>
+</div>

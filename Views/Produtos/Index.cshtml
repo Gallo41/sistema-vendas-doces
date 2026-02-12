@@ -1,0 +1,72 @@
+@model IEnumerable<Produto>
+
+@{
+    ViewData["Title"] = "Produtos";
+}
+
+<div class="container">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span>🍬 Lista de Produtos</span>
+            <a asp-action="Create" class="btn btn-success">➕ Novo Produto</a>
+        </div>
+        <div class="card-body">
+            @if (Model != null && Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Preço</th>
+                                <th>Estoque</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var produto in Model)
+                            {
+                                <tr>
+                                    <td data-label="Nome">@produto.Nome</td>
+                                    <td data-label="Preço">R$ @produto.PrecoVenda.ToString("N2")</td>
+                                    <td data-label="Estoque">
+                                        @produto.QuantidadeEstoque un
+                                        @if (produto.EstoqueMinimo.HasValue && produto.QuantidadeEstoque <= produto.EstoqueMinimo)
+                                        {
+                                            <span class="badge badge-danger">⚠️ Baixo</span>
+                                        }
+                                    </td>
+                                    <td data-label="Status">
+                                        @if (produto.Ativo)
+                                        {
+                                            <span class="badge badge-success">✓ Ativo</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge-danger">✗ Inativo</span>
+                                        }
+                                    </td>
+                                    <td data-label="Ações">
+                                        <div class="d-flex gap-2">
+                                            <a asp-action="Details" asp-route-id="@produto.Id" class="btn btn-primary btn-sm">👁️ Ver</a>
+                                            <a asp-action="Edit" asp-route-id="@produto.Id" class="btn btn-warning btn-sm">✏️ Editar</a>
+                                            <a asp-action="Delete" asp-route-id="@produto.Id" class="btn btn-danger btn-sm">🗑️ Excluir</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info text-center">
+                    <h3>📦 Nenhum produto cadastrado ainda</h3>
+                    <p>Clique no botão "Novo Produto" para começar!</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>

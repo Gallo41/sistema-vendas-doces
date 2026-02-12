@@ -1,0 +1,71 @@
+@model IEnumerable<SistemaVendasDoces.Models.Venda>
+
+@{
+    ViewData["Title"] = "Vendas";
+}
+
+<div class="container">
+    @if (TempData["Sucesso"] != null)
+    {
+        <div class="alert alert-success">✅ @TempData["Sucesso"]</div>
+    }
+    @if (TempData["Erro"] != null)
+    {
+        <div class="alert alert-danger">❌ @TempData["Erro"]</div>
+    }
+
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <span>💰 Histórico de Vendas</span>
+            <a asp-action="Create" class="btn btn-success">➕ Nova Venda</a>
+        </div>
+        <div class="card-body">
+            @if (Model != null && Model.Any())
+            {
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Data</th>
+                            <th>Cliente</th>
+                            <th>Itens</th>
+                            <th>Total</th>
+                            <th>Pagamento</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var venda in Model)
+                        {
+                            <tr>
+                                <td data-label="#">@venda.Id</td>
+                                <td data-label="Data">@venda.DataVenda.ToString("dd/MM/yy HH:mm")</td>
+                                <td data-label="Cliente">@(venda.Cliente?.Nome ?? "-")</td>
+                                <td data-label="Itens">@(venda.Itens?.Count ?? 0) produto(s)</td>
+                                <td data-label="Total"><strong>R$ @venda.ValorTotal.ToString("N2")</strong></td>
+                                <td data-label="Pagamento">
+                                    <span class="badge badge-success">@venda.FormaPagamento</span>
+                                </td>
+                                <td data-label="Ações">
+                                    <div class="d-flex gap-2">
+                                        <a asp-action="Details" asp-route-id="@venda.Id" class="btn btn-primary btn-sm">👁️ Ver</a>
+                                        <form asp-action="Delete" asp-route-id="@venda.Id" method="post" onsubmit="return confirm('Excluir esta venda? O estoque será devolvido.')">
+                                            <button type="submit" class="btn btn-danger btn-sm">🗑️</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div class="alert alert-info text-center">
+                    <h3>📭 Nenhuma venda registrada ainda</h3>
+                    <p>Clique em "Nova Venda" para registrar sua primeira venda!</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>

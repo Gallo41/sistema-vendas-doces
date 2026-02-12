@@ -1,0 +1,66 @@
+@model IEnumerable<Cliente>
+
+@{
+    ViewData["Title"] = "Clientes";
+}
+
+<div class="container">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span>👥 Lista de Clientes</span>
+            <a asp-action="Create" class="btn btn-success">➕ Novo Cliente</a>
+        </div>
+        <div class="card-body">
+            @if (Model != null && Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Telefone</th>
+                                <th>Email</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var cliente in Model)
+                            {
+                                <tr>
+                                    <td data-label="Nome">@cliente.Nome</td>
+                                    <td data-label="Telefone">@(cliente.Telefone ?? "-")</td>
+                                    <td data-label="Email">@(cliente.Email ?? "-")</td>
+                                    <td data-label="Status">
+                                        @if (cliente.Ativo)
+                                        {
+                                            <span class="badge badge-success">✓ Ativo</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge-danger">✗ Inativo</span>
+                                        }
+                                    </td>
+                                    <td data-label="Ações">
+                                        <div class="d-flex gap-2">
+                                            <a asp-action="Details" asp-route-id="@cliente.Id" class="btn btn-primary btn-sm">👁️ Ver</a>
+                                            <a asp-action="Edit" asp-route-id="@cliente.Id" class="btn btn-warning btn-sm">✏️ Editar</a>
+                                            <a asp-action="Delete" asp-route-id="@cliente.Id" class="btn btn-danger btn-sm">🗑️ Excluir</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info text-center">
+                    <h3>👤 Nenhum cliente cadastrado ainda</h3>
+                    <p>Clique no botão "Novo Cliente" para começar!</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>

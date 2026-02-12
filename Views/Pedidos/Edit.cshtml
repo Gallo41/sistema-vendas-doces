@@ -1,0 +1,87 @@
+@model Pedido
+
+@{
+    ViewData["Title"] = "Editar Pedido";
+}
+
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            ✏️ Editar Pedido #@Model.Id
+        </div>
+        <div class="card-body">
+            <form asp-action="Edit" method="post">
+                <input type="hidden" asp-for="Id" />
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Status do Pedido</h5>
+                        <div class="form-group mb-3">
+                            <label asp-for="Status" class="control-label">Status</label>
+                            <select asp-for="Status" class="form-control" asp-items="Html.GetEnumSelectList<StatusPedido>()"></select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Informações de Pagamento</h5>
+                        <div class="form-group mb-3">
+                            <label class="control-label">Registrar Pagamento</label>
+                            <input type="text" inputmode="decimal" name="novoPagamento" class="form-control" placeholder="R$ 0,00" />
+                            <small class="text-muted">Valor Total: R$ @Model.ValorTotal.ToString("N2") | Pago: R$ @Model.ValorPago.ToString("N2") | Pendente: R$ @Model.ValorPendente.ToString("N2")</small>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label asp-for="FormaPagamento" class="control-label">Forma de Pagamento</label>
+                            <select asp-for="FormaPagamento" class="form-control">
+                                <option value="">Selecione</option>
+                                <option value="Dinheiro">Dinheiro</option>
+                                <option value="Pix">Pix</option>
+                                <option value="Cartão Débito">Cartão Débito</option>
+                                <option value="Cartão Crédito">Cartão Crédito</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Observacoes" class="control-label">Observações</label>
+                    <textarea asp-for="Observacoes" class="form-control" rows="3"></textarea>
+                </div>
+
+                <div class="alert alert-warning">
+                    <strong>⚠️ Atenção:</strong> Ao marcar como "Entregue", uma venda será criada automaticamente e o estoque será atualizado.
+                </div>
+
+                <h5 class="mt-4">Itens do Pedido</h5>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Produto</th>
+                            <th>Quantidade</th>
+                            <th>Preço Unit.</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Itens != null)
+                        {
+                            @foreach (var item in Model.Itens)
+                            {
+                                <tr>
+                                    <td>@item.Produto?.Nome</td>
+                                    <td>@item.Quantidade</td>
+                                    <td>R$ @item.PrecoUnitario.ToString("N2")</td>
+                                    <td>R$ @item.Subtotal.ToString("N2")</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Salvar Alterações</button>
+                    <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

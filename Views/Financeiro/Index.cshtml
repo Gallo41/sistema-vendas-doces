@@ -1,0 +1,68 @@
+@{
+    ViewData["Title"] = "Financeiro";
+    var totalAReceber = (decimal)ViewBag.TotalAReceber;
+    var recebidoMes = (decimal)ViewBag.RecebidoMes;
+    var pedidosPendentes = (List<Pedido>)ViewBag.PedidosPendentes;
+}
+
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            💵 Dashboard Financeiro
+        </div>
+        <div class="card-body">
+            <div class="dashboard-grid mb-4">
+                <div class="stat-card">
+                    <h3>💰</h3>
+                    <h3>R$ @totalAReceber.ToString("N2")</h3>
+                    <p>Total a Receber</p>
+                </div>
+                <div class="stat-card">
+                    <h3>💵</h3>
+                    <h3>R$ @recebidoMes.ToString("N2")</h3>
+                    <p>Recebido no Mês</p>
+                </div>
+                <div class="stat-card">
+                    <h3>📋</h3>
+                    <h3>@pedidosPendentes.Count</h3>
+                    <p>Pedidos com Pagamento Pendente</p>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 mb-3">
+                <a asp-action="Devedores" class="btn btn-warning">Ver Clientes Devedores</a>
+            </div>
+
+            <h5>Pedidos com Pagamento Pendente</h5>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Cliente</th>
+                        <th>Data</th>
+                        <th>Valor Total</th>
+                        <th>Pago</th>
+                        <th>Pendente</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var pedido in pedidosPendentes)
+                    {
+                        <tr>
+                            <td>@pedido.Id</td>
+                            <td>@pedido.Cliente?.Nome</td>
+                            <td>@pedido.DataPedido.ToString("dd/MM/yyyy")</td>
+                            <td>R$ @pedido.ValorTotal.ToString("N2")</td>
+                            <td>R$ @pedido.ValorPago.ToString("N2")</td>
+                            <td class="text-danger"><strong>R$ @pedido.ValorPendente.ToString("N2")</strong></td>
+                            <td>
+                                <a asp-controller="Pedidos" asp-action="Edit" asp-route-id="@pedido.Id" class="btn btn-sm btn-primary">Receber</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

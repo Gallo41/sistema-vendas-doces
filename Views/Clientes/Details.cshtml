@@ -1,0 +1,69 @@
+@model Cliente
+
+@{
+    ViewData["Title"] = "Detalhes do Cliente";
+}
+
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            👁️ Detalhes do Cliente
+        </div>
+        <div class="card-body">
+            <h2 style="color: var(--purple-lightest);">@Model.Nome</h2>
+
+            <div style="margin-top: 2rem;">
+                @if (!string.IsNullOrEmpty(Model.Telefone))
+                {
+                    <div class="form-group">
+                        <strong>📱 Telefone:</strong> @Model.Telefone
+                    </div>
+                }
+
+                @if (!string.IsNullOrEmpty(Model.Email))
+                {
+                    <div class="form-group">
+                        <strong>📧 Email:</strong> @Model.Email
+                    </div>
+                }
+
+                @if (!string.IsNullOrEmpty(Model.Endereco))
+                {
+                    <div class="form-group">
+                        <strong>📍 Endereço:</strong> @Model.Endereco
+                    </div>
+                }
+
+                <div class="form-group">
+                    <strong>📅 Cliente desde:</strong> @Model.DataCadastro.ToString("dd/MM/yyyy")
+                </div>
+
+                <div class="form-group">
+                    <strong>Status:</strong>
+                    @if (Model.Ativo)
+                    {
+                        <span class="badge badge-success">✓ Ativo</span>
+                    }
+                    else
+                    {
+                        <span class="badge badge-danger">✗ Inativo</span>
+                    }
+                </div>
+            </div>
+
+            @if (Model.Vendas != null && Model.Vendas.Any())
+            {
+                <div style="margin-top: 2rem;">
+                    <h3 style="color: var(--purple-light);">💰 Histórico de Vendas</h3>
+                    <p>Total de vendas: @Model.Vendas.Count()</p>
+                </div>
+            }
+
+            <div class="d-flex gap-2 mt-3">
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">✏️ Editar</a>
+                <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">🗑️ Excluir</a>
+                <a asp-action="Index" class="btn btn-secondary">↩️ Voltar</a>
+            </div>
+        </div>
+    </div>
+</div>

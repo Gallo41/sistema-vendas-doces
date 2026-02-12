@@ -1,0 +1,64 @@
+@model dynamic
+
+@{
+    ViewData["Title"] = "Clientes Frequentes";
+    var dataInicio = (DateTime)ViewBag.DataInicio;
+    var dataFim = (DateTime)ViewBag.DataFim;
+}
+
+<div class="container">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span>👥 Clientes Mais Frequentes</span>
+            <a asp-action="Index" class="btn btn-secondary">Voltar</a>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row mb-4">
+                <div class="col-md-4">
+                    <label>Data Início</label>
+                    <input type="date" name="dataInicio" class="form-control" value="@dataInicio.ToString("yyyy-MM-dd")">
+                </div>
+                <div class="col-md-4">
+                    <label>Data Fim</label>
+                    <input type="date" name="dataFim" class="form-control" value="@dataFim.ToString("yyyy-MM-dd")">
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary">Filtrar</button>
+                </div>
+            </form>
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Posição</th>
+                        <th>Cliente</th>
+                        <th>Total Gasto</th>
+                        <th>Qtd Pedidos</th>
+                        <th>Último Pedido</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int posicao = 1;
+                    }
+                    @foreach (var cliente in Model)
+                    {
+                        <tr>
+                            <td>
+                                @if (posicao == 1) { <span>🥇</span> }
+                                else if (posicao == 2) { <span>🥈</span> }
+                                else if (posicao == 3) { <span>🥉</span> }
+                                else { <span>@posicao</span> }
+                            </td>
+                            <td>@cliente.Cliente?.Nome</td>
+                            <td>R$ @cliente.TotalGasto.ToString("N2")</td>
+                            <td>@cliente.QuantidadePedidos pedidos</td>
+                            <td>@cliente.UltimoPedido.ToString("dd/MM/yyyy")</td>
+                        </tr>
+                        posicao++;
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

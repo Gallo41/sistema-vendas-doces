@@ -1,0 +1,44 @@
+@model Cliente
+
+@{
+    ViewData["Title"] = "Excluir Cliente";
+}
+
+<div class="container">
+    <div class="card">
+        <div class="card-header" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+            🗑️ Confirmar Exclusão
+        </div>
+        <div class="card-body">
+            <div class="alert alert-danger">
+                <h3>⚠️ Atenção!</h3>
+                <p>Você tem certeza que deseja excluir este cliente?</p>
+            </div>
+
+            <h2 style="color: var(--purple-lightest);">@Model.Nome</h2>
+            
+            <div style="margin-top: 2rem;">
+                @if (!string.IsNullOrEmpty(Model.Telefone))
+                {
+                    <div class="form-group">
+                        <strong>Telefone:</strong> @Model.Telefone
+                    </div>
+                }
+                @if (!string.IsNullOrEmpty(Model.Email))
+                {
+                    <div class="form-group">
+                        <strong>Email:</strong> @Model.Email
+                    </div>
+                }
+            </div>
+
+            <form asp-action="Delete" method="post" style="margin-top: 2rem;">
+                <input type="hidden" asp-for="Id" />
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-danger">🗑️ Sim, Excluir</button>
+                    <a asp-action="Index" class="btn btn-secondary">↩️ Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

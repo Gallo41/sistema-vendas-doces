@@ -1,0 +1,69 @@
+@model SistemaVendasDoces.Models.Venda
+
+@{
+    ViewData["Title"] = "Detalhes da Venda #" + Model.Id;
+}
+
+<div class="container">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <span>🧾 Venda #@Model.Id</span>
+            <a asp-action="Index" class="btn btn-secondary btn-sm">↩️ Voltar</a>
+        </div>
+        <div class="card-body">
+            <div class="row g-3 mb-4">
+                <div class="col-12 col-md-6">
+                    <div style="background: rgba(255,255,255,0.03); border-radius: 12px; padding: 1.2rem; border: 1px solid var(--purple-primary);">
+                        <p><strong>👤 Cliente:</strong> @(Model.Cliente?.Nome ?? "-")</p>
+                        <p><strong>📅 Data:</strong> @Model.DataVenda.ToString("dd/MM/yyyy HH:mm")</p>
+                        <p><strong>💳 Pagamento:</strong> @Model.FormaPagamento</p>
+                        @if (!string.IsNullOrEmpty(Model.Observacoes))
+                        {
+                            <p><strong>📝 Obs:</strong> @Model.Observacoes</p>
+                        }
+                    </div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <div style="background: linear-gradient(135deg, var(--purple-primary), var(--purple-bright)); border-radius: 12px; padding: 1.5rem; text-align: center;">
+                        <h2 style="margin: 0;">💰 R$ @Model.ValorTotal.ToString("N2")</h2>
+                        <p style="margin: 0.5rem 0 0; color: var(--purple-lightest);">Valor Total</p>
+                    </div>
+                </div>
+            </div>
+
+            <h5 style="color: var(--purple-lightest);">🍬 Itens da Venda</h5>
+
+            @if (Model.Itens != null && Model.Itens.Any())
+            {
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Produto</th>
+                            <th>Qtd</th>
+                            <th>Preço Un.</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Itens)
+                        {
+                            <tr>
+                                <td data-label="Produto">@(item.Produto?.Nome ?? "Produto removido")</td>
+                                <td data-label="Qtd">@item.Quantidade</td>
+                                <td data-label="Preço Un.">R$ @item.PrecoUnitario.ToString("N2")</td>
+                                <td data-label="Subtotal"><strong>R$ @item.Subtotal.ToString("N2")</strong></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+
+            <div class="d-flex gap-2 mt-3">
+                <a asp-action="Index" class="btn btn-primary">↩️ Voltar às Vendas</a>
+                <form asp-action="Delete" asp-route-id="@Model.Id" method="post" onsubmit="return confirm('Tem certeza que deseja excluir esta venda? O estoque será devolvido.')">
+                    <button type="submit" class="btn btn-danger">🗑️ Excluir Venda</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

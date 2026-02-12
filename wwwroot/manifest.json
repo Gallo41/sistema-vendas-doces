@@ -1,0 +1,21 @@
+{
+    "name": "Sistema de Vendas de Doces",
+    "short_name": "Doces Sales",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#10002B",
+    "theme_color": "#5A189A",
+    "orientation": "portrait",
+    "icons": [
+        {
+            "src": "/images/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "/images/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        }
+    ]
+}

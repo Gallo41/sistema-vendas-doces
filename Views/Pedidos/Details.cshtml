@@ -1,0 +1,117 @@
+@model Pedido
+
+@{
+    ViewData["Title"] = "Detalhes do Pedido";
+}
+
+<div class="container">
+    @if (TempData["Sucesso"] != null)
+    {
+        <div class="alert alert-success">@TempData["Sucesso"]</div>
+    }
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span>📋 Pedido #@Model.Id</span>
+            <div>
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Editar</a>
+                <a asp-action="Index" class="btn btn-secondary">Voltar</a>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <h5>Informações do Pedido</h5>
+                    <p><strong>Cliente:</strong> @Model.Cliente?.Nome</p>
+                    <p><strong>Data do Pedido:</strong> @Model.DataPedido.ToString("dd/MM/yyyy HH:mm")</p>
+                    @if (Model.DataEntrega.HasValue)
+                    {
+                        <p><strong>Data de Entrega:</strong> @Model.DataEntrega.Value.ToString("dd/MM/yyyy HH:mm")</p>
+                    }
+@using SistemaVendasDoces.Helpers
+                    <p><strong>Status:</strong> 
+                        @{
+                            var statusClass = Model.Status switch
+                            {
+                                StatusPedido.Pendente => "badge bg-status-pendente",
+                                StatusPedido.EmProducao => "badge bg-status-emproducao",
+                                StatusPedido.Pronto => "badge bg-status-pronto",
+                                StatusPedido.Entregue => "badge bg-status-entregue",
+                                StatusPedido.Cancelado => "badge bg-status-cancelado",
+                                _ => "badge bg-secondary"
+                            };
+                        }
+                        <span class="@statusClass">@Model.Status.GetDisplayName()</span>
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <h5>Informações de Pagamento</h5>
+                    <p><strong>Status Pagamento:</strong> 
+                        @{
+                            var pagamentoClass = Model.StatusPagamento switch
+                            {
+                                StatusPagamento.Pendente => "badge bg-pagamento-pendente",
+                                StatusPagamento.Parcial => "badge bg-pagamento-parcial",
+                                StatusPagamento.Pago => "badge bg-pagamento-pago",
+                                _ => "badge bg-secondary"
+                            };
+                        }
+                        <span class="@pagamentoClass">@Model.StatusPagamento.GetDisplayName()</span>
+                    </p>
+                    <p><strong>Valor Total:</strong> R$ @Model.ValorTotal.ToString("N2")</p>
+                    <p><strong>Valor Pago:</strong> R$ @Model.ValorPago.ToString("N2")</p>
+                    <p><strong>Valor Pendente:</strong> R$ @Model.ValorPendente.ToString("N2")</p>
+                    @if (!string.IsNullOrEmpty(Model.FormaPagamento))
+                    {
+                        <p><strong>Forma de Pagamento:</strong> @Model.FormaPagamento</p>
+                    }
+                </div>
+            </div>
+
+            @if (!string.IsNullOrEmpty(Model.Observacoes))
+            {
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <h5>Observações</h5>
+                        <p>@Model.Observacoes</p>
+                    </div>
+                </div>
+            }
+
+            <div class="row">
+                <div class="col-12">
+                    <h5>Itens do Pedido</h5>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Produto</th>
+                                <th>Quantidade</th>
+                                <th>Preço Unitário</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.Itens != null)
+                            {
+                                @foreach (var item in Model.Itens)
+                                {
+                                    <tr>
+                                        <td data-label="Produto">@item.Produto?.Nome</td>
+                                        <td data-label="Qtd">@item.Quantidade</td>
+                                        <td data-label="Preço Un.">R$ @item.PrecoUnitario.ToString("N2")</td>
+                                        <td data-label="Subtotal">R$ @item.Subtotal.ToString("N2")</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="3" class="text-end">Total:</th>
+                                <th>R$ @Model.ValorTotal.ToString("N2")</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,84 @@
+@model Pedido
+
+@{
+    ViewData["Title"] = "Novo Pedido";
+}
+
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            ➕ Novo Pedido
+        </div>
+        <div class="card-body">
+            <form asp-action="Create" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="ClienteId" class="control-label">Cliente</label>
+                    <select asp-for="ClienteId" class="form-control" asp-items="ViewBag.Clientes">
+                        <option value="">Selecione um cliente</option>
+                    </select>
+                    <span asp-validation-for="ClienteId" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label class="control-label">Produtos</label>
+                    <div id="produtos-container">
+                        @foreach (var produto in (List<Produto>)ViewBag.Produtos)
+                        {
+                            <div class="form-check mb-2">
+                                <div class="row align-items-center">
+                                    <div class="col-md-6">
+                                        <label class="form-check-label">
+                                            <strong>@produto.Nome</strong> - R$ @produto.PrecoVenda.ToString("N2")
+                                            <small class="text-muted">(Estoque: @produto.QuantidadeEstoque)</small>
+                                        </label>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="number" 
+                                               name="quantidades" 
+                                               class="form-control" 
+                                               placeholder="Qtd" 
+                                               min="0" 
+                                               max="@produto.QuantidadeEstoque"
+                                               value="0" 
+                                               data-preco="@produto.PrecoVenda"
+                                               onchange="atualizarTotal()">
+                                        <input type="hidden" name="produtoIds" value="@produto.Id">
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label class="control-label">Observações</label>
+                    <textarea asp-for="Observacoes" class="form-control" rows="3"></textarea>
+                </div>
+
+                <div class="alert alert-info">
+                    <strong>Valor Total:</strong> R$ <span id="valor-total">0,00</span>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Criar Pedido</button>
+                    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function atualizarTotal() {
+    let total = 0;
+    const quantidadeInputs = document.querySelectorAll('input[name="quantidades"]');
+    quantidadeInputs.forEach(input => {
+        const quantidade = parseInt(input.value) || 0;
+        const preco = parseFloat(input.dataset.preco) || 0;
+        total += quantidade * preco;
+    });
+    document.getElementById('valor-total').textContent = total.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+</script>

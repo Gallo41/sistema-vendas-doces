@@ -1,0 +1,71 @@
+@model DashboardViewModel
+
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            📊 Dashboard - Visão Geral
+        </div>
+        <div class="card-body">
+            <div class="dashboard-grid">
+                <div class="stat-card">
+                    <h3>🍬</h3>
+                    <h3>@Model.TotalProdutos</h3>
+                    <p>Produtos Cadastrados</p>
+                </div>
+                <div class="stat-card">
+                    <h3>👥</h3>
+                    <h3>@Model.TotalClientes</h3>
+                    <p>Clientes Ativos</p>
+                </div>
+                <div class="stat-card">
+                    <h3>💰</h3>
+                    <h3>R$ @Model.VendasMes.ToString("N2")</h3>
+                    <p>Vendas do Mês</p>
+                </div>
+                <div class="stat-card">
+                    <h3>📦</h3>
+                    <h3>@Model.ProdutosEmEstoque</h3>
+                    <p>Produtos em Estoque</p>
+                </div>
+            </div>
+
+            <div class="mt-3">
+                <h2 style="color: var(--purple-lightest); margin-bottom: 1rem;">🚀 Começar Agora</h2>
+                <div class="d-flex flex-wrap gap-2">
+                    <a asp-controller="Produtos" asp-action="Create" class="btn btn-primary">
+                        ➕ Cadastrar Produto
+                    </a>
+                    <a asp-controller="Clientes" asp-action="Create" class="btn btn-success">
+                        ➕ Cadastrar Cliente
+                    </a>
+                    <a asp-controller="Vendas" asp-action="Create" class="btn btn-warning">
+                        💵 Nova Venda
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            ℹ️ Bem-vinda ao Sistema!
+        </div>
+        <div class="card-body">
+            <p style="font-size: 1.1rem; line-height: 1.8;">
+                Este é o <strong>Sistema de Vendas de Doces</strong> criado especialmente para ajudar no gerenciamento do negócio. 
+                Aqui você pode:
+            </p>
+            <ul style="font-size: 1.1rem; line-height: 2; margin-top: 1rem;">
+                <li>📝 Cadastrar e gerenciar produtos</li>
+                <li>👤 Manter registro de clientes</li>
+                <li>💳 Registrar vendas e formas de pagamento</li>
+                <li>📊 Controlar estoque automaticamente</li>
+                <li>📈 Visualizar relatórios de vendas</li>
+            </ul>
+        </div>
+    </div>
+</div>

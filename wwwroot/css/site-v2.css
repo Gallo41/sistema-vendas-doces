@@ -1,0 +1,650 @@
+/* ========================================
+   PALETA DE CORES ROXA - Sistema de Vendas
+   ======================================== */
+:root {
+    --purple-darkest: #10002B;
+    --purple-dark: #240046;
+    --purple-medium: #3C096C;
+    --purple-primary: #5A189A;
+    --purple-bright: #7B2CBF;
+    --purple-light: #9D4EDD;
+    --purple-lighter: #C77DFF;
+    --purple-lightest: #E0AAFF;
+
+    --bg-dark: #16103a;
+    --bg-card: #241a4a;
+    --text-light: #ffffff;
+    --text-muted: #b8b8d1;
+    --shadow: rgba(123, 44, 191, 0.3);
+}
+
+/* ========================================
+   RESET E CONFIGURAÇÕES GLOBAIS
+   ======================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, var(--purple-darkest) 0%, var(--purple-dark) 100%);
+    color: var(--text-light);
+    min-height: 100vh;
+    line-height: 1.6;
+}
+
+/* ========================================
+   NAVBAR - Menu de Navegação
+   ======================================== */
+.navbar {
+    background: linear-gradient(90deg, var(--purple-medium) 0%, var(--purple-primary) 100%) !important;
+    padding: 0.8rem 1rem;
+    box-shadow: 0 4px 20px var(--shadow);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.navbar-brand {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: var(--text-light) !important;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.nav-link {
+    color: var(--purple-lightest) !important;
+    padding: 0.5rem 0.8rem !important;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    font-size: 1.1rem;
+}
+
+.nav-link:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: var(--text-light) !important;
+}
+
+/* Desktop: esconder texto, mostrar só emoji */
+@media (min-width: 992px) {
+    .nav-text {
+        display: none;
+    }
+
+    .nav-link {
+        font-size: 1.5rem;
+        padding: 0.3rem 0.6rem !important;
+    }
+}
+
+/* Mobile: mostrar texto + emoji no dropdown */
+@media (max-width: 991.98px) {
+    .nav-text {
+        display: inline;
+    }
+
+    .navbar-collapse {
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 12px;
+        padding: 1rem;
+        margin-top: 0.5rem;
+    }
+}
+
+/* Estilo do botão toggler */
+.navbar-toggler {
+    border-color: rgba(255, 255, 255, 0.3) !important;
+    padding: 0.4rem 0.6rem;
+}
+
+.navbar-toggler:focus {
+    box-shadow: 0 0 0 0.2rem rgba(157, 78, 221, 0.5);
+}
+
+/* ========================================
+   CONTAINER E CARDS
+   ======================================== */
+.container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.card {
+    background: var(--bg-card);
+    border: 1px solid var(--purple-primary);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px var(--shadow);
+    margin-bottom: 2rem;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px var(--shadow);
+}
+
+.card-header {
+    background: linear-gradient(135deg, var(--purple-primary) 0%, var(--purple-bright) 100%);
+    color: var(--text-light);
+    padding: 1.2rem 1.5rem;
+    font-size: 1.3rem;
+    font-weight: bold;
+    border-bottom: 3px solid var(--purple-light);
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+/* ========================================
+   BOTÕES
+   ======================================== */
+.btn {
+    padding: 0.6rem 1.2rem;
+    border-radius: 10px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--purple-bright) 0%, var(--purple-primary) 100%);
+    color: var(--text-light);
+    box-shadow: 0 4px 15px rgba(123, 44, 191, 0.4);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, var(--purple-light) 0%, var(--purple-bright) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(123, 44, 191, 0.6);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: var(--text-light);
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+    transform: translateY(-2px);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: var(--text-light);
+}
+
+.btn-danger:hover {
+    background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+    transform: translateY(-2px);
+}
+
+.btn-warning {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: var(--text-light);
+}
+
+.btn-warning:hover {
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+    color: var(--text-light);
+}
+
+.btn-secondary:hover {
+    background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
+    transform: translateY(-2px);
+}
+
+.btn-info {
+    background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+    color: var(--text-light);
+}
+
+/* ========================================
+   FORMULÁRIOS - CONTRASTE FORTE
+   ======================================== */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+/* Labels SEMPRE brancos */
+.form-label,
+label,
+.card-body label,
+.card-body .form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #E0AAFF !important;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+/* Todos os textos dentro de cards = branco */
+.card-body,
+.card-body p,
+.card-body span,
+.card-body strong,
+.card-body h1,
+.card-body h2,
+.card-body h3,
+.card-body h4,
+.card-body h5,
+.card-body h6,
+.card-body td,
+.card-body th,
+.card-body li,
+.card-body a {
+    color: #ffffff !important;
+}
+
+/* Inputs, selects, textareas = fundo roxo escuro + texto branco */
+.form-control,
+.form-select,
+input[type="text"],
+input[type="email"],
+input[type="number"],
+input[type="tel"],
+input[type="password"],
+input[type="date"],
+input[type="datetime-local"],
+textarea,
+select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: rgba(90, 24, 154, 0.3) !important;
+    border: 2px solid var(--purple-bright) !important;
+    border-radius: 10px;
+    color: #ffffff !important;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    -webkit-text-fill-color: #ffffff !important;
+}
+
+/* Focus state */
+.form-control:focus,
+.form-select:focus,
+input:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    border-color: var(--purple-lighter) !important;
+    background: rgba(90, 24, 154, 0.5) !important;
+    box-shadow: 0 0 0 3px rgba(157, 78, 221, 0.3);
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+
+/* Select dropdown options */
+select.form-control,
+.form-select,
+select {
+    background-color: #241a4a !important;
+    color: #ffffff !important;
+    cursor: pointer;
+}
+
+select.form-control option,
+.form-select option,
+select option {
+    background-color: #1e0a3c;
+    color: #ffffff;
+    padding: 10px;
+}
+
+/* Autofill do Chrome/Safari - forçar cores */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px #241a4a inset !important;
+    -webkit-text-fill-color: #ffffff !important;
+    transition: background-color 5000s ease-in-out 0s;
+    caret-color: #ffffff;
+}
+
+/* Placeholder */
+.form-control::placeholder,
+input::placeholder,
+textarea::placeholder {
+    color: #b8a8d8 !important;
+    opacity: 1;
+}
+
+/* Validation errors */
+.text-danger {
+    color: #f87171 !important;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+/* Checkbox e radio labels */
+.form-check-label,
+input[type="checkbox"]+label,
+label input[type="checkbox"] {
+    color: #ffffff !important;
+}
+
+/* Strong, bold, dentro de qualquer contexto */
+strong,
+b {
+    color: #E0AAFF !important;
+}
+
+/* ========================================
+   TABELAS (DESKTOP) - CONTRASTE FORTE
+   ======================================== */
+.table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 1rem;
+    --bs-table-bg: transparent !important;
+    --bs-table-color: #ffffff !important;
+    --bs-table-hover-bg: rgba(123, 44, 191, 0.2) !important;
+    --bs-table-hover-color: #ffffff !important;
+    --bs-table-striped-bg: transparent !important;
+    --bs-table-striped-color: #ffffff !important;
+    color: #ffffff !important;
+}
+
+.table thead {
+    background: linear-gradient(135deg, var(--purple-primary) 0%, var(--purple-bright) 100%) !important;
+}
+
+.table thead th {
+    padding: 1rem;
+    text-align: left;
+    color: #ffffff !important;
+    font-weight: 600;
+    border-bottom: 3px solid var(--purple-light);
+    background: transparent !important;
+}
+
+.table thead th:first-child {
+    border-top-left-radius: 10px;
+}
+
+.table thead th:last-child {
+    border-top-right-radius: 10px;
+}
+
+.table tbody tr {
+    background: rgba(36, 26, 74, 0.6) !important;
+    transition: all 0.3s ease;
+    color: #ffffff !important;
+}
+
+.table tbody tr:hover {
+    background: rgba(123, 44, 191, 0.3) !important;
+}
+
+.table tbody td {
+    padding: 1rem;
+    border-bottom: 1px solid rgba(123, 44, 191, 0.2);
+    color: #ffffff !important;
+    background: transparent !important;
+}
+
+/* Links dentro de tabelas */
+.table a {
+    color: #C77DFF !important;
+}
+
+/* Badges dentro de tabelas */
+.table .badge {
+    color: #ffffff !important;
+}
+
+.table tbody tr:last-child td:first-child {
+    border-bottom-left-radius: 10px;
+}
+
+.table tbody tr:last-child td:last-child {
+    border-bottom-right-radius: 10px;
+}
+
+/* tfoot */
+.table tfoot th,
+.table tfoot td {
+    color: #ffffff !important;
+    background: transparent !important;
+}
+
+/* ========================================
+   DASHBOARD - Página Inicial
+   ======================================== */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, var(--purple-medium) 0%, var(--purple-primary) 100%);
+    padding: 1.5rem;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 8px 32px var(--shadow);
+    transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.stat-card h3 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    color: var(--purple-lightest);
+}
+
+.stat-card p {
+    color: var(--text-muted);
+    font-size: 1rem;
+}
+
+/* ========================================
+   BADGES E ALERTAS
+   ======================================== */
+.badge {
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.badge-success {
+    background: #10b981;
+    color: white;
+}
+
+.badge-danger {
+    background: #ef4444;
+    color: white;
+}
+
+.alert {
+    padding: 1rem 1.5rem;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+}
+
+.alert-success {
+    background: rgba(16, 185, 129, 0.2);
+    border: 1px solid #10b981;
+    color: #34d399;
+}
+
+.alert-danger {
+    background: rgba(239, 68, 68, 0.2);
+    border: 1px solid #ef4444;
+    color: #f87171;
+}
+
+.alert-info {
+    background: rgba(6, 182, 212, 0.15);
+    border: 1px solid #06b6d4;
+    color: #67e8f9;
+}
+
+/* ========================================
+   FOOTER
+   ======================================== */
+.footer {
+    background: var(--purple-darkest);
+    color: var(--text-muted);
+    text-align: center;
+    padding: 1.5rem;
+    margin-top: 3rem;
+    border-top: 3px solid var(--purple-primary);
+}
+
+/* ========================================
+   RESPONSIVIDADE MOBILE - CARD LAYOUT
+   ======================================== */
+@media (max-width: 991.98px) {
+    .container {
+        padding: 0 0.5rem !important;
+        margin: 1rem auto !important;
+    }
+
+    .card-body {
+        padding: 1rem !important;
+    }
+
+    .card-header {
+        font-size: 1.1rem;
+        padding: 1rem;
+    }
+
+    /* Desabilitar scroll horizontal */
+    .table-responsive {
+        overflow-x: visible !important;
+    }
+
+    /* Esconder cabeçalho da tabela */
+    table.table thead,
+    .table-responsive table thead {
+        display: none !important;
+    }
+
+    /* Transformar tudo em blocos */
+    table.table,
+    table.table tbody,
+    table.table tr,
+    table.table td,
+    .table-responsive table,
+    .table-responsive table tbody,
+    .table-responsive table tr,
+    .table-responsive table td {
+        display: block !important;
+        width: 100% !important;
+    }
+
+    /* Cada linha vira um card */
+    table.table tbody tr,
+    .table-responsive table tbody tr {
+        margin-bottom: 1.2rem !important;
+        background: linear-gradient(135deg, #2d1b69, #1e1145) !important;
+        border: 2px solid var(--purple-bright) !important;
+        border-radius: 15px !important;
+        padding: 1rem !important;
+        box-shadow: 0 4px 15px rgba(90, 24, 154, 0.4) !important;
+    }
+
+    /* Cada célula vira uma linha com label */
+    table.table tbody td,
+    .table-responsive table tbody td {
+        text-align: right !important;
+        padding: 0.6rem 0.5rem !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        font-size: 0.95rem !important;
+    }
+
+    /* Última célula sem borda */
+    table.table tbody td:last-child,
+    .table-responsive table tbody td:last-child {
+        border-bottom: none !important;
+        justify-content: center !important;
+        padding-top: 1rem !important;
+    }
+
+    /* Labels automáticos */
+    table.table tbody td::before,
+    .table-responsive table tbody td::before {
+        content: attr(data-label);
+        font-weight: bold;
+        color: var(--purple-lightest);
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        white-space: nowrap;
+        margin-right: 1rem;
+    }
+
+    /* Botões empilhados */
+    .btn {
+        width: 100% !important;
+        margin-bottom: 0.4rem !important;
+    }
+
+    .d-flex.gap-2 {
+        flex-direction: column !important;
+        width: 100%;
+    }
+
+    /* Dashboard grid */
+    .dashboard-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 0.8rem !important;
+    }
+
+    .stat-card h3 {
+        font-size: 1.5rem;
+    }
+
+    .stat-card p {
+        font-size: 0.85rem;
+    }
+}
+
+/* Telas muito pequenas */
+@media (max-width: 480px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* ========================================
+   ANIMAÇÕES
+   ======================================== */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card {
+    animation: fadeIn 0.4s ease-out;
+}

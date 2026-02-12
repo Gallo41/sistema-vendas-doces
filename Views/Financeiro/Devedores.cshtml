@@ -1,0 +1,74 @@
+@using SistemaVendasDoces.Models.ViewModels
+@model IEnumerable<DevedorViewModel>
+
+@{
+    ViewData["Title"] = "Devedores";
+}
+
+<div class="container">
+    <div class="card border-danger">
+        <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
+            <span>📉 Clientes Devedores</span>
+            <a asp-action="Index" class="btn btn-light btn-sm text-danger fw-bold">Voltar</a>
+        </div>
+        <div class="card-body">
+            @if (Model != null && Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Cliente</th>
+                                <th>Telefone</th>
+                                <th>Total Devendo</th>
+                                <th>Pedidos em Aberto</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var devedor in Model)
+                            {
+                                <tr>
+                                    <td data-label="Cliente">@devedor.Cliente.Nome</td>
+                                    <td data-label="Telefone">@(devedor.Cliente.Telefone ?? "-")</td>
+                                    <td data-label="Total Devendo" class="text-danger fw-bold">R$ @devedor.TotalDevendo.ToString("N2")</td>
+                                    <td data-label="Pedidos em Aberto">@devedor.QuantidadePedidos</td>
+                                    <td data-label="Ações">
+                                        <button class="btn btn-sm btn-info w-100" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-@devedor.ClienteId">
+                                            Ver Detalhes
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr class="collapse" id="collapse-@devedor.ClienteId">
+                                    <td colspan="5" style="display: block; width: 100%;">
+                                        <div class="card card-body bg-light">
+                                            <h6>Pedidos Pendentes:</h6>
+                                            <ul>
+                                                @foreach (var pedido in devedor.Pedidos)
+                                                {
+                                                    <li>
+                                                        Pedido #@pedido.Id - @pedido.DataPedido.ToString("dd/MM/yyyy") - 
+                                                        Total: R$ @pedido.ValorTotal.ToString("N2") - 
+                                                        <strong>Falta: R$ @pedido.ValorPendente.ToString("N2")</strong>
+                                                        <a asp-controller="Pedidos" asp-action="Edit" asp-route-id="@pedido.Id" class="ms-2 btn btn-xs btn-outline-primary">Receber</a>
+                                                    </li>
+                                                }
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-success text-center">
+                    <h3>🎉 Ninguém está devendo!</h3>
+                    <p>Todos os pagamentos estão em dia.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
