@@ -28,19 +28,19 @@ else
     try 
     {
         var dbUri = new Uri(connectionString);
-        var userInfo = dbUri.UserInfo.Split(new[] { ':' }, 2); // Split em no máximo 2 partes (user:pass)
+        var userInfo = dbUri.UserInfo.Split(new[] { ':' }, 2);
         var username = userInfo[0];
         var password = userInfo.Length > 1 ? userInfo[1] : "";
-        
-        // Decodifica %20, etc se necessário (Uri faz isso, mas garantindo)
         password = Uri.UnescapeDataString(password);
 
-        connectionString = $"Server={dbUri.Host};Port={dbUri.Port};Database={dbUri.AbsolutePath.TrimStart('/')};User={username};Password={password};SslMode=None;";
+        connectionString = $"Server={dbUri.Host};Port={dbUri.Port};Database={dbUri.AbsolutePath.TrimStart('/')};User={username};Password={password};SslMode=Preferred;";
+        
+        // Log para debug (sem mostrar a senha)
+        Console.WriteLine($"Tentando conectar em: Server={dbUri.Host};Port={dbUri.Port};Database={dbUri.AbsolutePath.TrimStart('/')};User={username};SslMode=Preferred");
     }
     catch (Exception ex)
     {
         Console.WriteLine($"Erro ao fazer parse da DATABASE_URL: {ex.Message}");
-        // Se falhar, tenta usar como está ou fallback
     }
 }
 
